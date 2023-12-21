@@ -1,1 +1,4 @@
-# Projekt_Darwin_World_PO_2023
+# Projekt_Darwin_World
+
+Autorzy: Bartłomiej Stylski i Wiktor Warzecha
+Numer grupy i godzina zajęć: GR nr 3, PT 08:00
