@@ -15,7 +15,7 @@
                 <TextField fx:id="movesTextField" minWidth="250" />
             </top>
             <left>
-                <Button fx:id="startButton" text="Click to start" onAction="#onSimulationStartClicked"/>
+                <Button text="Start" onAction="#onSimulationStartClicked"/>
             </left>
             <bottom>
                 <Label fx:id="printMove" text="Move to print" textAlignment="CENTER" alignment="CENTER"/>

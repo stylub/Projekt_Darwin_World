@@ -1,23 +1,21 @@
 package agh.ics.oop.presenter;
 
-import agh.ics.oop.OptionsParser;
 import agh.ics.oop.Simulation;
 import agh.ics.oop.model.*;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
-import javafx.scene.text.Text;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SimulationPresenter implements MapChangeListener {
-
     private WorldMap worldMap;
     @FXML
     private TextField movesTextField;
@@ -35,12 +33,9 @@ public class SimulationPresenter implements MapChangeListener {
         int maxY = worldMap.getCurrentBounds().rightTop().getY();
         int minX = worldMap.getCurrentBounds().leftBottom().getX();
         int minY = worldMap.getCurrentBounds().leftBottom().getY();
-//        int tileWidth = 20;
-//        int tileHeight = 20;
         int tileWidth = Math.min((int) 300/maxX-minX+1, (int) 300/maxY-minY+1);
         int tileHeight = tileWidth;
-//        int tileWidth = (int) 300/maxX-minX+1;
-//        int tileHeight = (int) 300/maxY-minY+1;
+
 
 
         mapGrid.addColumn(0);    //coordinates col
@@ -89,9 +84,14 @@ public class SimulationPresenter implements MapChangeListener {
     }
     public void onSimulationStartClicked() throws InterruptedException {
         String[] moves = movesTextField.getText().split(" ");
-        this.worldMap = new GrassField(10);
+        List<Integer> intMoves = Arrays.stream(moves)
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+
+        this.worldMap = new Globe(10,10);
         worldMap.addListener(this);
-        Simulation simulation = new Simulation(OptionsParser.movesStringToEnum(moves), List.of(new Vector2d(2,2),new Vector2d(4,4)), worldMap);
+
+        Simulation simulation = new Simulation(intMoves, List.of(new Vector2d(2,2),new Vector2d(4,4)), worldMap);
         List<Simulation> simulationList = new ArrayList<>();
         Thread thread = new Thread(simulation);
         thread.start();

@@ -14,10 +14,16 @@ public class Vector2d {
         return "(" + x + "," + y + ")";
     }
 
+    /**
+     * Check if @param other vector is after current vector
+     */
     public boolean precedes(Vector2d other){
         return this.x <= other.x && this.y <= other.y;
     }
 
+    /**
+     * Check if @param other vector is before current vector
+     */
     public boolean follows(Vector2d other){
         return this.x >= other.x && this.y >= other.y;
     }
