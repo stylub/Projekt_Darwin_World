@@ -11,8 +11,8 @@ public class Simulation implements Runnable{
     private final List<Vector2d> toPlaceList;
     private final List<Animal> animalList;
     private final List<Integer> movesList;
-    private final WorldMap map;
-    public Simulation(List<Integer> movesList, List<Vector2d> vector2dList, WorldMap map){
+    private final Globe map;
+    public Simulation(List<Integer> movesList, List<Vector2d> vector2dList, Globe map){
         this.animalList = new ArrayList<>();
         this.toPlaceList = vector2dList;
         this.movesList = movesList;
@@ -29,6 +29,7 @@ public class Simulation implements Runnable{
             for (int index = 0; index < movesList.size(); index++) {
                 map.rotate(animalList.get(index % animalList.size()), movesList.get(index));
                 map.forward(animalList.get(index % animalList.size()));
+                map.growGrass();
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {

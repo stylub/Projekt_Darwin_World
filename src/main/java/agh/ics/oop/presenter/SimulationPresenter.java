@@ -16,14 +16,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class SimulationPresenter implements MapChangeListener {
-    private WorldMap worldMap;
+    private Globe worldMap;
     @FXML
     private TextField movesTextField;
     @FXML
     private GridPane mapGrid;
     @FXML
     private Label printMove;
-    public void setWorldMap(WorldMap worldMap) {
+    public void setWorldMap(Globe worldMap) {
         this.worldMap = worldMap;
     }
     @FXML
@@ -88,7 +88,7 @@ public class SimulationPresenter implements MapChangeListener {
                 .map(Integer::parseInt)
                 .collect(Collectors.toList());
 
-        this.worldMap = new Globe(10,10);
+        this.worldMap = new Globe(10,10,25,10);
         worldMap.addListener(this);
 
         Simulation simulation = new Simulation(intMoves, List.of(new Vector2d(2,2),new Vector2d(4,4)), worldMap);

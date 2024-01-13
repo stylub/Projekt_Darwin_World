@@ -7,9 +7,12 @@ import java.util.*;
 public class Globe implements WorldMap{
     private Boundary boundary;
     private Map<Vector2d, Animal> animals = new HashMap<>();
-
     private Map<Vector2d,Grass> grass = new HashMap<>();
     private final UUID id = UUID.randomUUID();
+
+    private final int newGrass;
+
+    RandomPositionGenerator grassGenerator;
     MapVisualizer visualizer = new MapVisualizer(this);
     private final List<MapChangeListener> observers = new ArrayList<>();
     public void registerObserver(MapChangeListener observer) {
@@ -24,8 +27,13 @@ public class Globe implements WorldMap{
         }
     }
 
-    public Globe(int width,int height){
+    public Globe(int width,int height,int startingGrass, int newGrass){
+        this.newGrass = newGrass;
         boundary = new Boundary(new Vector2d(0, 0), new Vector2d(width, height));
+        this.grassGenerator = new RandomPositionGenerator(width + 1,height + 1,startingGrass,0.8);
+        for(var pos : grassGenerator){
+            grass.put(pos,new Grass(pos));
+        }
     }
     @Override
     public void place(Animal animal){
@@ -113,4 +121,10 @@ public class Globe implements WorldMap{
         return boundary.rightTop().follows(position) && boundary.leftBottom().precedes(position);
     }
 
+    public void growGrass(){
+        grassGenerator.generateNewPositions(this.newGrass,grass);
+        for(var pos : grassGenerator){
+            grass.put(pos,new Grass(pos));
+        }
+    }
 }
