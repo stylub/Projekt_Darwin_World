@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;;import java.util.ArrayList;
 import java.util.List;
 
 public class SimulationEngineTest{
+    // TO DO: PRZEPISAĆ NA MAPE GLOBE
     @Test
     public void RunSyncTest(){
         ArrayList<Simulation> simulations = new ArrayList<>();

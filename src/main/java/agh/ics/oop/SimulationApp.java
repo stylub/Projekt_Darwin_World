@@ -1,9 +1,5 @@
 package agh.ics.oop;
 
-import agh.ics.oop.model.ConsoleMapDisplay;
-import agh.ics.oop.model.Grass;
-import agh.ics.oop.model.GrassField;
-import agh.ics.oop.model.Vector2d;
 import agh.ics.oop.presenter.SimulationPresenter;
 
 import javafx.application.Application;
@@ -13,8 +9,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class SimulationApp extends Application {
     @Override
