@@ -2,45 +2,74 @@ package agh.ics.oop;
 
 import agh.ics.oop.model.*;
 import agh.ics.oop.model.util.MapVisualizer;
+import agh.ics.oop.model.util.RandomPositionGenerator;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class Simulation implements Runnable{
-    private final List<Vector2d> toPlaceList;
-    private final List<Animal> animalList;
-    private final List<Integer> movesList;
-    private final Globe map;
-    public Simulation(List<Integer> movesList, List<Vector2d> vector2dList, Globe map){
+    List<Animal> animalList;
+    List<Vector2d> toPlaceList;
+    Globe map;
+    int howLong;
+    int staringAnimals;
+    int startingGrass;
+    int newGrass;
+    int startEnergy;
+    int energyFromGrass;
+    int fullEnergy;
+    int procreationEnergy;
+    int numberOfMutations;
+    int GenomeLength;
+    public Simulation(simulationBuilder builder){
+        this.map = builder.map;
+        this.howLong = builder.howLong;
+        this.staringAnimals = builder.staringAnimals;
+        this.startingGrass = builder.startingGrass;
         this.animalList = new ArrayList<>();
-        this.toPlaceList = vector2dList;
-        this.movesList = movesList;
-        this.map = map;
+        this.toPlaceList = new ArrayList<>();
+        this.newGrass = builder.newGrass;
+        this.startEnergy = builder.startEnergy;
+        this.energyFromGrass = builder.energyFromGrass;
+        this.fullEnergy = builder.fullEnergy;
+        this.procreationEnergy = builder.procreationEnergy;
+        this.numberOfMutations = builder.numberOfMutations;
+        this.GenomeLength = builder.GenomeLength;
+
+        RandomPositionGenerator positionGenerator = new RandomPositionGenerator(map.getCurrentBounds(),staringAnimals);
+        for(var pos : positionGenerator){
+            toPlaceList.add(pos);
+        }
     }
     @Override
     public void run(){
         for (int index = 0; index < toPlaceList.size(); index++) {
-            animalList.add(new Animal(toPlaceList.get(index)));
+            Animal newAnimal = new AnimalBuilder()
+                    .setEnergy(startEnergy)
+                    .setGenomeLength(GenomeLength)
+                    .setProcreationEnergy(procreationEnergy)
+                    .setEnergyFromGrass(energyFromGrass)
+                    .setFullEnergy(fullEnergy)
+                    .setNumberOfMutations(numberOfMutations)
+                    .setPosition(toPlaceList.get(index))
+                    .build();
+
+            Random random = new Random();
+            newAnimal.rotate(random.nextInt(8));
+            animalList.add(newAnimal);
             map.place(animalList.get(index));
         }
 
-        if (!animalList.isEmpty()) {
-            for (int index = 0; index < movesList.size(); index++) {
-                map.rotate(animalList.get(index % animalList.size()), movesList.get(index));
-                map.forward(animalList.get(index % animalList.size()));
-                map.growGrass();
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+        for(int i =0;i<howLong;i++){
+            map.update();
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
     }
-
-    public List<Animal> getAnimalList() {
-        return Collections.unmodifiableList(animalList);
-    }
-
 }
+

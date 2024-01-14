@@ -1,18 +1,19 @@
 package agh.ics.oop.model;
 
+import agh.ics.oop.model.util.GrassGenerator;
 import agh.ics.oop.model.util.MapVisualizer;
 
 import java.util.*;
 
 public class Globe implements WorldMap{
-    private Boundary boundary;
-    private Map<Vector2d, Animal> animals = new HashMap<>();
-    private Map<Vector2d,Grass> grass = new HashMap<>();
+    private final Boundary boundary;
+    private final Map<Vector2d, Animal> animals = new HashMap<>();
+    private final Map<Vector2d,Grass> grass = new HashMap<>();
     private final UUID id = UUID.randomUUID();
 
     private final int newGrass;
 
-    RandomPositionGenerator grassGenerator;
+    GrassGenerator grassGenerator;
     MapVisualizer visualizer = new MapVisualizer(this);
     private final List<MapChangeListener> observers = new ArrayList<>();
     public void registerObserver(MapChangeListener observer) {
@@ -30,7 +31,7 @@ public class Globe implements WorldMap{
     public Globe(int width,int height,int startingGrass, int newGrass){
         this.newGrass = newGrass;
         boundary = new Boundary(new Vector2d(0, 0), new Vector2d(width, height));
-        this.grassGenerator = new RandomPositionGenerator(width + 1,height + 1,startingGrass,0.8);
+        this.grassGenerator = new GrassGenerator(width + 1,height + 1,startingGrass,0.8);
         for(var pos : grassGenerator){
             grass.put(pos,new Grass(pos));
         }
@@ -38,32 +39,38 @@ public class Globe implements WorldMap{
     @Override
     public void place(Animal animal){
         animals.put(animal.getPosition(), animal);
-        notifyObservers("Animal placed at " + animal.getPosition());
     }
 
-    @Override
-    public void rotate(Animal animal, int directionChange) {
+    /**
+     * rotates animal by multiple of 45 degrees angle.
+     * @param directionChange specify how much animal will be rotated
+     */
+    public void rotate(Animal animal,int directionChange) {
         animal.rotate(directionChange);
     }
 
-    @Override
+    public void rotate(Animal animal){
+        animal.rotate();
+    }
+
+    /**
+     * Moves animal forward in current direction of given animal
+     * @param animal The animal to move forward
+     */
+
     public void forward(Animal animal) {
         Vector2d oldPosition = animal.getPosition();
         Vector2d newPosition = animal.forward();
         if(!insideMap(newPosition)){
             newPosition = wrap(newPosition);
-            if(newPosition.equals(oldPosition))
-                rotate(animal,4);
-            else
+//            if(newPosition.equals(oldPosition))
+//                rotate(animal,4);
+//            else
                 animal.moveTo(newPosition);
 
         }
         animals.remove(oldPosition);
         animals.put(newPosition,animal);
-
-        if (!oldPosition.equals(animal.getPosition())) {
-            notifyObservers("Animal moved from " + oldPosition + " to " + animal.getPosition());
-        }
     }
 
     public Vector2d wrap(Vector2d position){
@@ -76,10 +83,10 @@ public class Globe implements WorldMap{
             x = 0;
         }
         if(y < 0){
-            y = 0;
+            y +=1;
         }
         if(y > boundary.rightTop().getY()){
-            y = boundary.rightTop().getY();
+            y -=1;
         }
         return new Vector2d(x,y);
     }
@@ -126,5 +133,15 @@ public class Globe implements WorldMap{
         for(var pos : grassGenerator){
             grass.put(pos,new Grass(pos));
         }
+    }
+
+    public void update(){
+        List<Animal> animalsToUpdate = new ArrayList<>(animals.values());
+        for(Animal animal : animalsToUpdate){
+            rotate(animal);
+            forward(animal);
+        }
+        growGrass();
+        notifyObservers("Update");
     }
 }

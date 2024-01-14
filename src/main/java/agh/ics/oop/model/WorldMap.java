@@ -17,17 +17,13 @@ public interface WorldMap{
      */
     void place(Animal animal);
 
-    /**
-     * rotates animal by multiple of 45 degrees angle.
-     * @param directionChange specify how much animal will be rotated
-     */
-    void rotate(Animal animal, int directionChange);
 
     /**
-     * Moves animal forward in current direction of given animal
-     * @param animal The animal to move forward
+     * update all worldElements on the map
      */
-    void forward(Animal animal);
+    void update();
+
+
     /**
      * Return true if given position on the map is occupied. Should not be
      * confused with canMove since there might be empty positions where the animal

@@ -1,21 +1,19 @@
-package agh.ics.oop.model;
+package agh.ics.oop.model.util;
+
+import agh.ics.oop.model.Grass;
+import agh.ics.oop.model.Vector2d;
 
 import java.util.*;
 
 import static java.lang.Math.min;
 
-public class RandomPositionGenerator implements Iterable<Vector2d>, Iterator<Vector2d> {
-    private List<Vector2d> positions;
+public class GrassGenerator extends RandomPositionGenerator{
     private HashSet<Vector2d> preferredPositions = new HashSet<>();
-    private int currentIndex = 0;
-    private final int maxWidth;
-    private final int  maxHeight;
     long seed = System.nanoTime();
     private final double ratio;
-    public RandomPositionGenerator(int maxWidth, int maxHeight, int grassCount, double ratio) {
+    public GrassGenerator(int maxWidth, int maxHeight, int grassCount, double ratio) {
+        super(maxWidth, maxHeight);
 
-        this.maxWidth = maxWidth;
-        this.maxHeight = maxHeight;
         this.ratio = ratio;
 
         initializePreferredPositions();
@@ -32,6 +30,7 @@ public class RandomPositionGenerator implements Iterable<Vector2d>, Iterator<Vec
                 }
             }
         }
+
         Collections.shuffle(preferred, new Random(seed));
         Collections.shuffle(notPreferred, new Random(seed));
         int numberOfPreferredToGet = min(preferred.size(),(int) (grassCount * ratio));
@@ -71,7 +70,7 @@ public class RandomPositionGenerator implements Iterable<Vector2d>, Iterator<Vec
         preferredPositions.addAll(allPositions);
     }
 
-    public void generateNewPositions(int grassCount, Map<Vector2d,Grass> currentGrass) {
+    public void generateNewPositions(int grassCount, Map<Vector2d, Grass> currentGrass) {
         currentIndex = 0;
         List<Vector2d> preferred = new ArrayList<>();
         List<Vector2d> notPreferred = new ArrayList<>();
@@ -95,17 +94,7 @@ public class RandomPositionGenerator implements Iterable<Vector2d>, Iterator<Vec
         positions = preferred.subList(0,numberOfPreferredToGet);
         positions.addAll(notPreferred.subList(0,grassCount - numberOfPreferredToGet));
     }
-
-    @Override
-    public Iterator<Vector2d> iterator() {
-        return this;
-    }
-    @Override
-    public boolean hasNext() {
-        return currentIndex < positions.size();
-    }
-    @Override
-    public Vector2d next() {
-        return positions.get(currentIndex++);
+    public List<Vector2d> getPositions(){
+        return positions;
     }
 }

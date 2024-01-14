@@ -2,6 +2,7 @@ package agh.ics.oop.presenter;
 
 import agh.ics.oop.Simulation;
 import agh.ics.oop.model.*;
+import agh.ics.oop.simulationBuilder;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
@@ -26,6 +27,8 @@ public class SimulationPresenter implements MapChangeListener {
     public void setWorldMap(Globe worldMap) {
         this.worldMap = worldMap;
     }
+
+
     @FXML
     public void drawMap(){
         clearGrid();
@@ -33,7 +36,7 @@ public class SimulationPresenter implements MapChangeListener {
         int maxY = worldMap.getCurrentBounds().rightTop().getY();
         int minX = worldMap.getCurrentBounds().leftBottom().getX();
         int minY = worldMap.getCurrentBounds().leftBottom().getY();
-        int tileWidth = Math.min((int) 300/maxX-minX+1, (int) 300/maxY-minY+1);
+        int tileWidth = Math.min((int) 600/maxX-minX+1, (int) 600/maxY-minY+1);
         int tileHeight = tileWidth;
 
 
@@ -83,15 +86,29 @@ public class SimulationPresenter implements MapChangeListener {
         });
     }
     public void onSimulationStartClicked() throws InterruptedException {
-        String[] moves = movesTextField.getText().split(" ");
-        List<Integer> intMoves = Arrays.stream(moves)
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
+//        String[] moves = movesTextField.getText().split(" ");
+//        List<Integer> intMoves = Arrays.stream(moves)
+//                .map(Integer::parseInt)
+//                .collect(Collectors.toList());
 
-        this.worldMap = new Globe(10,10,25,10);
+        this.worldMap = new Globe(10,10,5,5);
         worldMap.addListener(this);
 
-        Simulation simulation = new Simulation(intMoves, List.of(new Vector2d(2,2),new Vector2d(4,4)), worldMap);
+
+        Simulation simulation = new Simulation(new simulationBuilder()
+                .setMap(worldMap)
+                .setHowLong(100)
+                .setStaringAnimals(3)
+                .setStartingGrass(5)
+                .setNewGrass(5)
+                .setStartEnergy(5)
+                .setEnergyFromGrass(5)
+                .setFullEnergy(5)
+                .setProcreationEnergy(5)
+                .setNumberOfMutations(5)
+                .setGenomeLength(5)
+        );
+
         List<Simulation> simulationList = new ArrayList<>();
         Thread thread = new Thread(simulation);
         thread.start();

@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.GridPane?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            minHeight="550.0" minWidth="850.0"
+            minHeight="900.0" minWidth="1600.0"
             fx:controller="agh.ics.oop.presenter.SimulationPresenter">
     <top>
         <BorderPane minHeight="70" minWidth="400">
