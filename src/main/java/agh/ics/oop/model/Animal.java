@@ -1,11 +1,11 @@
 package agh.ics.oop.model;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
 
 
-public class Animal implements  WorldElement{
+public class Animal implements  WorldElement, Comparable<Animal>{
+    private final UUID id = UUID.randomUUID();
     private MapDirection direction = MapDirection.NORTH;
     public Vector2d position;
     public List<Integer> genome;
@@ -14,6 +14,8 @@ public class Animal implements  WorldElement{
     public int fullEnergy;
     public int numberOfMutations;
     private int energy;
+    private int numberOfChildren = 0;
+    private int numberOfDescendants = 0;
     private int age = 0;
     private int activeGene;
     public Animal(AnimalBuilder builder){
@@ -64,6 +66,8 @@ public class Animal implements  WorldElement{
     public Vector2d forward(){
         Vector2d newPosition = position.add(direction.toUnitVector());
         this.position = newPosition;
+        energy -= 1;
+        age += 1;
         return newPosition;
     }
 
@@ -73,9 +77,57 @@ public class Animal implements  WorldElement{
     public MapDirection getDirection(){
         return direction;
     }
-
+    public int getEnergy(){
+        return energy;
+    }
+    public int getAge(){
+        return age;
+    }
+    public int getNumberOfChildren(){
+        return numberOfChildren;
+    }
     public Vector2d getPosition() {
         return position;
     }
+
+    public Boolean isDead(){
+        return energy <= 0;
+    }
+    public void eatGrass(int energy){
+        this.energy += energyFromGrass;
+    }
+    public UUID getId(){
+        return id;
+    }
+
+    @Override
+    public int compareTo(@NotNull Animal o) {
+        if(Integer.compare(this.energy,o.energy) == 0){
+            if(Integer.compare(this.age,o.age) == 0){
+                if (Integer.compare(this.numberOfChildren,o.numberOfChildren) == 0){
+                    if (Math.random() > 0.5)
+                        return -1;
+                    else
+                        return 1;
+                }
+                else
+                    return Integer.compare(this.numberOfChildren,o.numberOfChildren);
+            }
+            else
+                return Integer.compare(this.age,o.age);
+
+        }
+        else
+            return Integer.compare(this.energy,o.energy);
+    }
+    public void procreate(){
+        this.energy -= procreationEnergy;
+        this.numberOfChildren += 1;
+    }
+
+    public void addDescendant(){
+        this.numberOfDescendants += 1;
+    }
+
 }
 

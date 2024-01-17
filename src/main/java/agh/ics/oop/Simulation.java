@@ -15,8 +15,6 @@ public class Simulation implements Runnable{
     Globe map;
     int howLong;
     int staringAnimals;
-    int startingGrass;
-    int newGrass;
     int startEnergy;
     int energyFromGrass;
     int fullEnergy;
@@ -27,10 +25,8 @@ public class Simulation implements Runnable{
         this.map = builder.map;
         this.howLong = builder.howLong;
         this.staringAnimals = builder.staringAnimals;
-        this.startingGrass = builder.startingGrass;
         this.animalList = new ArrayList<>();
         this.toPlaceList = new ArrayList<>();
-        this.newGrass = builder.newGrass;
         this.startEnergy = builder.startEnergy;
         this.energyFromGrass = builder.energyFromGrass;
         this.fullEnergy = builder.fullEnergy;
@@ -65,7 +61,7 @@ public class Simulation implements Runnable{
         for(int i =0;i<howLong;i++){
             map.update();
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
