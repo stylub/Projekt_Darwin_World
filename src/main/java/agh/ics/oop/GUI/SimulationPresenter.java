@@ -1,34 +1,51 @@
-package agh.ics.oop.presenter;
+package agh.ics.oop.GUI;
 
 import agh.ics.oop.Simulation;
-import agh.ics.oop.model.*;
+import agh.ics.oop.model.Globe;
+import agh.ics.oop.model.MapChangeListener;
+import agh.ics.oop.model.Vector2d;
+import agh.ics.oop.model.WorldMap;
 import agh.ics.oop.simulationBuilder;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.*;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.RowConstraints;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class SimulationPresenter implements MapChangeListener {
-    private Globe worldMap;
-    @FXML
-    private TextField movesTextField;
     @FXML
     private GridPane mapGrid;
-    @FXML
-    private Label printMove;
-    public void setWorldMap(Globe worldMap) {
-        this.worldMap = worldMap;
+    private Globe worldMap;
+    public void initializeSimulation(HashMap<String, Integer> options) {
+        this.worldMap = new Globe(options.get("mapWidth"),
+                options.get("mapHeight"),
+                options.get("grassStartingNumber"),
+                options.get("grassRegeneration"));
+        worldMap.addListener(this);
+
+        Simulation simulation = new Simulation(new simulationBuilder()
+                .setMap(worldMap)
+                .setHowLong(100)
+                .setStaringAnimals(options.get("animalStartingNumber"))
+                .setStartingGrass(options.get("grassStartingNumber"))
+                .setNewGrass(options.get("grassRegeneration"))
+                .setStartEnergy(options.get("animalStartingEnergy"))
+                .setEnergyFromGrass(options.get("grassEnergy"))
+                .setFullEnergy(options.get("animalFullEnergy"))
+                .setProcreationEnergy(options.get("animalBreedEnergy"))
+                .setNumberOfMutations(options.get("minMutations"))
+                .setGenomeLength(options.get("genomeLength"))
+        );
+        List<Simulation> simulationList = new ArrayList<>();
+        Thread thread = new Thread(simulation);
+        thread.start();
     }
-
-
     @FXML
     public void drawMap(){
         clearGrid();
@@ -80,37 +97,7 @@ public class SimulationPresenter implements MapChangeListener {
     }
     @Override
     public void mapChanged(WorldMap worldMap, String message) {
-        Platform.runLater(() -> {
-            printMove.setText(message);
-            drawMap();
-        });
+        Platform.runLater(this::drawMap);
     }
-    public void onSimulationStartClicked() throws InterruptedException {
-//        String[] moves = movesTextField.getText().split(" ");
-//        List<Integer> intMoves = Arrays.stream(moves)
-//                .map(Integer::parseInt)
-//                .collect(Collectors.toList());
 
-        this.worldMap = new Globe(10,10,5,5);
-        worldMap.addListener(this);
-
-
-        Simulation simulation = new Simulation(new simulationBuilder()
-                .setMap(worldMap)
-                .setHowLong(100)
-                .setStaringAnimals(3)
-                .setStartingGrass(5)
-                .setNewGrass(5)
-                .setStartEnergy(5)
-                .setEnergyFromGrass(5)
-                .setFullEnergy(5)
-                .setProcreationEnergy(5)
-                .setNumberOfMutations(5)
-                .setGenomeLength(5)
-        );
-
-        List<Simulation> simulationList = new ArrayList<>();
-        Thread thread = new Thread(simulation);
-        thread.start();
-    }
 }
