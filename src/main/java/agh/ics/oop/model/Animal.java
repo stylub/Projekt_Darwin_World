@@ -93,8 +93,8 @@ public class Animal implements  WorldElement, Comparable<Animal>{
     public Boolean isDead(){
         return energy <= 0;
     }
-    public void eatGrass(int energy){
-        this.energy += energyFromGrass;
+    public void eatGrass(){
+        this.energy += this.energyFromGrass;
     }
     public UUID getId(){
         return id;
@@ -105,10 +105,7 @@ public class Animal implements  WorldElement, Comparable<Animal>{
         if(Integer.compare(this.energy,o.energy) == 0){
             if(Integer.compare(this.age,o.age) == 0){
                 if (Integer.compare(this.numberOfChildren,o.numberOfChildren) == 0){
-                    if (Math.random() > 0.5)
-                        return -1;
-                    else
-                        return 1;
+                    return this.id.compareTo(o.id);
                 }
                 else
                     return Integer.compare(this.numberOfChildren,o.numberOfChildren);
@@ -120,13 +117,23 @@ public class Animal implements  WorldElement, Comparable<Animal>{
         else
             return Integer.compare(this.energy,o.energy);
     }
-    public void procreate(){
+    public Boolean isFull(){
+        return this.energy >= this.fullEnergy;
+    }
+    public int procreate(){
         this.energy -= procreationEnergy;
         this.numberOfChildren += 1;
+        return procreationEnergy;
     }
 
     public void addDescendant(){
         this.numberOfDescendants += 1;
+    }
+    public int getNumberOfDescendants(){
+        return numberOfDescendants;
+    }
+    public List<Integer> getGenome(){
+        return genome;
     }
 
 }

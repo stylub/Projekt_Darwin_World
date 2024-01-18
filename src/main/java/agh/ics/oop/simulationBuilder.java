@@ -30,16 +30,6 @@ public class simulationBuilder {
         return this;
     }
 
-    public simulationBuilder setStartingGrass(int startingGrass) {
-        this.startingGrass = startingGrass;
-        return this;
-    }
-
-    public simulationBuilder setNewGrass(int newGrass) {
-        this.newGrass = newGrass;
-        return this;
-    }
-
     public simulationBuilder setStartEnergy(int startEnergy) {
         this.startEnergy = startEnergy;
         return this;

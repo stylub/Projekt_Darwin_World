@@ -91,22 +91,20 @@ public class SimulationPresenter implements MapChangeListener {
 //                .map(Integer::parseInt)
 //                .collect(Collectors.toList());
 
-        this.worldMap = new Globe(10,10,5,5);
+        this.worldMap = new Globe(5,5,40,0);
         worldMap.addListener(this);
 
 
         Simulation simulation = new Simulation(new simulationBuilder()
                 .setMap(worldMap)
-                .setHowLong(100)
-                .setStaringAnimals(3)
-                .setStartingGrass(5)
-                .setNewGrass(5)
-                .setStartEnergy(5)
+                .setHowLong(1000)
+                .setStaringAnimals(20)
+                .setStartEnergy(20)
                 .setEnergyFromGrass(5)
                 .setFullEnergy(5)
                 .setProcreationEnergy(5)
                 .setNumberOfMutations(5)
-                .setGenomeLength(5)
+                .setGenomeLength(10)
         );
 
         List<Simulation> simulationList = new ArrayList<>();
