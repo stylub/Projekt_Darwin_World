@@ -59,7 +59,14 @@ public class simulationBuilder {
         GenomeLength = genomeLength;
         return this;
     }
-
+    public simulationBuilder setStartingGrass(int startingGrass){
+        this.startingGrass = startingGrass;
+        return this;
+    }
+    public simulationBuilder setNewGrass(int newGrass){
+        this.newGrass = newGrass;
+        return this;
+    }
     public Simulation build() {
         return new Simulation(this);
     }
