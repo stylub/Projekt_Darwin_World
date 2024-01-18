@@ -34,5 +34,4 @@ public enum MapDirection {
     public String getName(){
         return this.name;
     }
-
 }

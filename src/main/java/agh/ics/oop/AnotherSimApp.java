@@ -1,7 +1,6 @@
 package agh.ics.oop;
 
 import agh.ics.oop.presenter.SimulationPresenter;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -11,21 +10,22 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class SimulationApp extends Application {
+public class AnotherSimApp extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException, InterruptedException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getClassLoader().getResource("simulation.fxml"));
-        BorderPane viewRoot = loader.load();
+        loader.setLocation(getClass().getClassLoader().getResource("launcher.fxml"));
+        VBox viewRoot = loader.load();
         SimulationPresenter presenter = loader.getController();
         configureStage(primaryStage, viewRoot);
+//        primaryStage.setScene(new Scene(viewRoot));
         primaryStage.show();
     }
-    private void configureStage(Stage primaryStage, BorderPane viewRoot) {
+    private void configureStage(Stage primaryStage, VBox viewRoot) {
         var scene = new Scene(viewRoot);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Simulation app");
-        primaryStage.minWidthProperty().bind(viewRoot.minWidthProperty());
-        primaryStage.minHeightProperty().bind(viewRoot.minHeightProperty());
+        primaryStage.setTitle("Simulation launcher");
+        primaryStage.minWidthProperty().bind(viewRoot.prefWidthProperty());
+        primaryStage.minHeightProperty().bind(viewRoot.prefHeightProperty());
     }
 }
