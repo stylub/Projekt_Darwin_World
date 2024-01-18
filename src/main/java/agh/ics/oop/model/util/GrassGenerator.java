@@ -14,6 +14,7 @@ public class GrassGenerator extends RandomPositionGenerator{
     public GrassGenerator(int maxWidth, int maxHeight, int grassCount, double ratio) {
         super(maxWidth, maxHeight);
 
+        grassCount = min(grassCount,maxWidth * maxHeight);
         this.ratio = ratio;
 
         initializePreferredPositions();
