@@ -1,27 +1,21 @@
 package agh.ics.oop.model;
 
 import agh.ics.oop.model.util.GrassGenerator;
-import agh.ics.oop.model.util.MapVisualizer;
 
 import java.util.*;
 
 public class Globe implements WorldMap{
     private final Boundary boundary;
-    private final Map<Vector2d, Animal> animals = new HashMap<>();
+    private final Map<Vector2d, List<Animal>> animals = new HashMap<>();
     private final Map<Vector2d,Grass> grass = new HashMap<>();
     private final UUID id = UUID.randomUUID();
-
     private final int newGrass;
-
+    private AnimalBuilder animalConfiguration;
+    private final Set<Vector2d> grassToEat = new HashSet<>();
+    private final Set<Vector2d> animalsToProcreate = new HashSet<>();
     GrassGenerator grassGenerator;
-    MapVisualizer visualizer = new MapVisualizer(this);
     private final List<MapChangeListener> observers = new ArrayList<>();
-    public void registerObserver(MapChangeListener observer) {
-        observers.add(observer);
-    }
-    public void unregisterObserver(MapChangeListener observer) {
-        observers.remove(observer);
-    }
+
     public void notifyObservers(String description) {
         for (MapChangeListener observer : observers) {
             observer.mapChanged(this,description);
@@ -36,9 +30,34 @@ public class Globe implements WorldMap{
             grass.put(pos,new Grass(pos));
         }
     }
+    public void setAnimalConfiguration(AnimalBuilder animalConfiguration){
+        this.animalConfiguration = animalConfiguration;
+    }
+
     @Override
     public void place(Animal animal){
-        animals.put(animal.getPosition(), animal);
+        if(!insideMap(animal.getPosition())){
+            throw new IllegalArgumentException("Animal is out of map");
+        }
+        if(animals.containsKey(animal.getPosition())){
+            animals.get(animal.getPosition()).add(animal);
+        }
+        else{
+            List<Animal> list = new ArrayList<>();
+            list.add(animal);
+            animals.put(animal.getPosition(),list);
+        }
+    }
+    public void remove(Animal animal){
+        List<Animal> animalsAtPosition = animals.get(animal.getPosition());
+        if(animalsAtPosition == null){
+            throw new IllegalArgumentException("There is no such animal on map");
+        }
+        animals.get(animal.getPosition()).remove(animal);
+
+        if (animalsAtPosition.isEmpty()) {
+            animals.remove(animal.getPosition());
+        }
     }
 
     /**
@@ -59,7 +78,8 @@ public class Globe implements WorldMap{
      */
 
     public void forward(Animal animal) {
-        Vector2d oldPosition = animal.getPosition();
+        this.remove(animal);
+        //Vector2d oldPosition = animal.getPosition();
         Vector2d newPosition = animal.forward();
         if(!insideMap(newPosition)){
             newPosition = wrap(newPosition);
@@ -69,8 +89,7 @@ public class Globe implements WorldMap{
                 animal.moveTo(newPosition);
 
         }
-        animals.remove(oldPosition);
-        animals.put(newPosition,animal);
+        this.place(animal);
     }
 
     public Vector2d wrap(Vector2d position){
@@ -99,7 +118,7 @@ public class Globe implements WorldMap{
     @Override
     public WorldElement objectAt(Vector2d position){
         if(animals.containsKey(position)) {
-            return animals.get(position);
+            return getStrongestAnimalsAtPosition(position).get(0);
         }
         else return grass.getOrDefault(position, null);
     }
@@ -136,12 +155,72 @@ public class Globe implements WorldMap{
     }
 
     public void update(){
-        List<Animal> animalsToUpdate = new ArrayList<>(animals.values());
-        for(Animal animal : animalsToUpdate){
+        List<Animal> animalsToUpdate = getAllAnimals();
+        List<Animal> aliveAnimals = new ArrayList<>();
+        for (Animal animal : animalsToUpdate) {
+            if (animal.isDead()) {
+                remove(animal);
+            }
+            else{
+                aliveAnimals.add(animal);
+            }
+        }
+
+        for (Animal animal : aliveAnimals) {
             rotate(animal);
             forward(animal);
+            if(grass.containsKey(animal.getPosition())){
+                grassToEat.add(animal.getPosition());
+            }
+            if(animals.containsKey(animal.getPosition()) && animals.get(animal.getPosition()).size() > 1){
+                animalsToProcreate.add(animal.getPosition());
+            }
         }
+        eatGrass();
+        procreate();
         growGrass();
-        notifyObservers("Update");
+        notifyObservers("Number of Animals now: " + getAllAnimals().size());
+    }
+
+    private List<Animal> getAllAnimals(){
+        List<Animal> allAnimals = new ArrayList<>();
+        for(List<Animal> list : animals.values()){
+            allAnimals.addAll(list);
+        }
+        return allAnimals;
+    }
+    private List<Animal> getStrongestAnimalsAtPosition(Vector2d position){
+        List<Animal> strongestAnimals = animals.get(position);
+        strongestAnimals.sort(Collections.reverseOrder());
+        return strongestAnimals;
+    }
+
+    private void eatGrass(){
+        for(var pos : grassToEat){
+            Animal strongestAnimal = getStrongestAnimalsAtPosition(pos).get(0);
+            strongestAnimal.eatGrass();
+            grass.remove(pos);
+        }
+        grassToEat.clear();
+    }
+
+    private void procreate(){
+        if (animalsToProcreate.isEmpty()) {
+            return;
+        }
+        NewAnimalCreator newAnimalCreator = new NewAnimalCreator(0,animalConfiguration);
+        for(var pos : animalsToProcreate){
+            List<Animal> strongestAnimals = getStrongestAnimalsAtPosition(pos);
+            if (strongestAnimals.size() < 2) {
+                continue;
+            }
+            Animal animal1 = strongestAnimals.get(0);
+            Animal animal2 = strongestAnimals.get(1);
+            if(newAnimalCreator.canProcreate(animal1,animal2)){
+                Animal newAnimal = newAnimalCreator.BornNewAnimal(animal1,animal2);
+                place(newAnimal);
+            }
+        }
+        animalsToProcreate.clear();
     }
 }

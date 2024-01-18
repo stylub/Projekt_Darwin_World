@@ -15,53 +15,32 @@ public class Simulation implements Runnable{
     Globe map;
     int howLong;
     int staringAnimals;
-    int startingGrass;
-    int newGrass;
-    int startEnergy;
-    int energyFromGrass;
-    int fullEnergy;
-    int procreationEnergy;
-    int numberOfMutations;
-    int GenomeLength;
+    AnimalBuilder animalBuilder;
     public Simulation(simulationBuilder builder){
         this.map = builder.map;
         this.howLong = builder.howLong;
         this.staringAnimals = builder.staringAnimals;
-        this.startingGrass = builder.startingGrass;
         this.animalList = new ArrayList<>();
         this.toPlaceList = new ArrayList<>();
-        this.newGrass = builder.newGrass;
-        this.startEnergy = builder.startEnergy;
-        this.energyFromGrass = builder.energyFromGrass;
-        this.fullEnergy = builder.fullEnergy;
-        this.procreationEnergy = builder.procreationEnergy;
-        this.numberOfMutations = builder.numberOfMutations;
-        this.GenomeLength = builder.GenomeLength;
 
         RandomPositionGenerator positionGenerator = new RandomPositionGenerator(map.getCurrentBounds(),staringAnimals);
         for(var pos : positionGenerator){
             toPlaceList.add(pos);
         }
+
+        animalBuilder = new AnimalBuilder()
+                .setEnergy(builder.startEnergy)
+                .setGenomeLength(builder.GenomeLength)
+                .setProcreationEnergy(builder.procreationEnergy)
+                .setEnergyFromGrass(builder.energyFromGrass)
+                .setFullEnergy(builder.fullEnergy)
+                .setNumberOfMutations(builder.numberOfMutations);
+
+        this.map.setAnimalConfiguration(animalBuilder);
     }
     @Override
     public void run(){
-        for (int index = 0; index < toPlaceList.size(); index++) {
-            Animal newAnimal = new AnimalBuilder()
-                    .setEnergy(startEnergy)
-                    .setGenomeLength(GenomeLength)
-                    .setProcreationEnergy(procreationEnergy)
-                    .setEnergyFromGrass(energyFromGrass)
-                    .setFullEnergy(fullEnergy)
-                    .setNumberOfMutations(numberOfMutations)
-                    .setPosition(toPlaceList.get(index))
-                    .build();
-
-            Random random = new Random();
-            newAnimal.rotate(random.nextInt(8));
-            animalList.add(newAnimal);
-            map.place(animalList.get(index));
-        }
-
+        initialize();
         for(int i =0;i<howLong;i++){
             map.update();
             try {
@@ -69,6 +48,17 @@ public class Simulation implements Runnable{
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+    private void initialize(){
+        for (Vector2d vector2d : toPlaceList) {
+            Animal newAnimal = this.animalBuilder
+                    .setPosition(vector2d)
+                    .build();
+
+            Random random = new Random();
+            newAnimal.rotate(random.nextInt(8));
+            map.place(newAnimal);
         }
     }
 }
