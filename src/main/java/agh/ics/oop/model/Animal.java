@@ -17,6 +17,7 @@ public class Animal implements  WorldElement, Comparable<Animal>{
     private int numberOfChildren = 0;
     private int numberOfDescendants = 0;
     private int age = 0;
+    private int numberOfGrassEaten = 0;
     private int activeGene;
     public Animal(AnimalBuilder builder){
         this.position = builder.position;
@@ -95,6 +96,7 @@ public class Animal implements  WorldElement, Comparable<Animal>{
     }
     public void eatGrass(){
         this.energy += this.energyFromGrass;
+        this.numberOfGrassEaten += 1;
     }
     public UUID getId(){
         return id;

@@ -2,6 +2,7 @@ package agh.ics.oop.model;
 
 import agh.ics.oop.model.util.GrassGenerator;
 
+import java.math.BigInteger;
 import java.util.*;
 
 public class Globe implements WorldMap{
@@ -17,6 +18,9 @@ public class Globe implements WorldMap{
     private final List<MapChangeListener> observers = new ArrayList<>();
     private final int grassVariant;
     private final int mutationVariant;
+
+    private BigInteger numberOfDeadAnimals = BigInteger.ZERO;
+    private BigInteger deadAnimalsSumOfLivedDays = BigInteger.ZERO;
 
     public void notifyObservers(String description) {
         for (MapChangeListener observer : observers) {
@@ -164,6 +168,8 @@ public class Globe implements WorldMap{
         for (Animal animal : animalsToUpdate) {
             if (animal.isDead()) {
                 remove(animal);
+                numberOfDeadAnimals = numberOfDeadAnimals.add(BigInteger.ONE);
+                deadAnimalsSumOfLivedDays = deadAnimalsSumOfLivedDays.add(BigInteger.valueOf(animal.getAge()));
             }
             else{
                 aliveAnimals.add(animal);
@@ -226,5 +232,61 @@ public class Globe implements WorldMap{
             }
         }
         animalsToProcreate.clear();
+    }
+    public Integer getNumberOfAnimals(){
+        return getAllAnimals().size();
+    }
+    public Integer getNumberOfGrass(){
+        return grass.values().size();
+    }
+    public Double getAverageEnergy(){
+        List<Animal> allAnimals = getAllAnimals();
+        if(allAnimals.isEmpty()){
+            return 0.0;
+        }
+        int sum = 0;
+        for (Animal animal : allAnimals) {
+            sum += animal.getEnergy();
+        }
+        return (double) sum / allAnimals.size();
+    }
+    public Integer getNumberOfFreePositions(){
+        int freePositions = 0;
+        int width = boundary.rightTop().getX();
+        int height = boundary.rightTop().getY();
+        for(int i = 0;i<=width;i++){
+            for(int j = 0;j<=height;j++){
+                Vector2d position = new Vector2d(i,j);
+                if(!isOccupied(position)){
+                    freePositions += 1;
+                }
+            }
+        }
+        return freePositions;
+    }
+    public Double getAverageNumberOfChildren(){
+        List<Animal> allAnimals = getAllAnimals();
+        if(allAnimals.isEmpty()){
+            return 0.0;
+        }
+        int sum = 0;
+        for (Animal animal : allAnimals) {
+            sum += animal.getNumberOfChildren();
+        }
+        return (double)sum / allAnimals.size();
+    }
+    public HashMap<String,String> getMapStatistics(){
+        HashMap<String,String> mapStatistics = new HashMap<>();
+        mapStatistics.put("numberOfAnimals",getNumberOfAnimals().toString());
+        mapStatistics.put("numberOfGrass",getNumberOfGrass().toString());
+        mapStatistics.put("numberOfFreePositions",getNumberOfFreePositions().toString());
+        mapStatistics.put("averageEnergy",getAverageEnergy().toString());
+        mapStatistics.put("averageNumberOfChildren",getAverageNumberOfChildren().toString());
+        Double averageLivedDays = 0.0;
+        if(numberOfDeadAnimals.compareTo(BigInteger.ZERO) != 0){
+            averageLivedDays = deadAnimalsSumOfLivedDays.divide(numberOfDeadAnimals).doubleValue();
+        }
+        mapStatistics.put("averageLivedDays",averageLivedDays.toString());
+        return mapStatistics;
     }
 }
