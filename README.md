@@ -16,3 +16,5 @@ Numer grupy i godzina zajęć: GR nr 3, PT 08:00
 * Dzień śmierci
 * Odbijanie się od ściany globu
 * Zdechłe truchła
+* Zapisywanie konfiguracji do pliku
+* Zapisywanie danych z symulacji do pliku
