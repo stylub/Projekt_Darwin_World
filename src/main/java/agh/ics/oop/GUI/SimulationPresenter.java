@@ -27,7 +27,9 @@ public class SimulationPresenter implements MapChangeListener {
         this.worldMap = new Globe(options.get("mapWidth"),
                 options.get("mapHeight"),
                 options.get("grassStartingNumber"),
-                options.get("grassRegeneration"));
+                options.get("grassRegeneration"),
+                options.get("grassGrowthVariant"),
+                options.get("mutationVariant"));
         worldMap.addListener(this);
 
         Simulation simulation = new Simulation(new simulationBuilder()
@@ -42,6 +44,7 @@ public class SimulationPresenter implements MapChangeListener {
                 .setProcreationEnergy(options.get("animalBreedEnergy"))
                 .setNumberOfMutations(options.get("minMutations"))
                 .setGenomeLength(options.get("genomeLength"))
+                .setFramePerSecond(options.get("framesPerSecond"))
         );
         List<Simulation> simulationList = new ArrayList<>();
         Thread thread = new Thread(simulation);

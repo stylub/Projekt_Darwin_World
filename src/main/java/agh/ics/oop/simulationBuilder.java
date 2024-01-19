@@ -14,7 +14,7 @@ public class simulationBuilder {
     int procreationEnergy;
     int numberOfMutations;
     int GenomeLength;
-    int framePerSecond;
+    int framePerSecond = 2;
 
     public simulationBuilder setMap(Globe map) {
         this.map = map;
@@ -70,14 +70,6 @@ public class simulationBuilder {
     }
     public simulationBuilder setFramePerSecond(int framePerSecond){
         this.framePerSecond = framePerSecond;
-        return this;
-    }
-    public simulationBuilder setGrassVariant(int grassVariant){
-        this.grassVariant = grassVariant;
-        return this;
-    }
-    public simulationBuilder setMutationVariant(int mutationVariant){
-        this.mutationVariant = mutationVariant;
         return this;
     }
     public Simulation build() {
