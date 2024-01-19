@@ -14,5 +14,7 @@ Numer grupy i godzina zajęć: GR nr 3, PT 08:00
 * Średnia liczba dzieci dla żyjących zwierzaków
 * Liczba zjedzonych roślin zwierzaka - atrybut Animal
 * Dzień śmierci
-
-  
+* Odbijanie się od ściany globu
+* Zdechłe truchła
+* Zapisywanie konfiguracji do pliku
+* Zapisywanie danych z symulacji do pliku
