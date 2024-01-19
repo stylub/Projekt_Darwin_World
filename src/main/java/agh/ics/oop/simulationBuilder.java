@@ -1,8 +1,10 @@
 package agh.ics.oop;
 
+import agh.ics.oop.model.AnimalBuilder;
 import agh.ics.oop.model.Globe;
 
 public class simulationBuilder {
+    public AnimalBuilder animalBuilder;
     Globe map;
     int howLong;
     int staringAnimals;
@@ -70,6 +72,10 @@ public class simulationBuilder {
     }
     public simulationBuilder setFramePerSecond(int framePerSecond){
         this.framePerSecond = framePerSecond;
+        return this;
+    }
+    public simulationBuilder setAnimalBuilder(AnimalBuilder animalBuilder){
+        this.animalBuilder = animalBuilder;
         return this;
     }
     public Simulation build() {

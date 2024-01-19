@@ -1,10 +1,7 @@
 package agh.ics.oop.GUI;
 
 import agh.ics.oop.Simulation;
-import agh.ics.oop.model.Globe;
-import agh.ics.oop.model.MapChangeListener;
-import agh.ics.oop.model.Vector2d;
-import agh.ics.oop.model.WorldMap;
+import agh.ics.oop.model.*;
 import agh.ics.oop.simulationBuilder;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -24,12 +21,22 @@ public class SimulationPresenter implements MapChangeListener {
     private Globe worldMap;
 
     public void initializeSimulation(HashMap<String, Integer> options) {
+        AnimalBuilder animalBuilder = new AnimalBuilder()
+                .setEnergy(options.get("animalStartingEnergy"))
+                .setGenomeLength(options.get("genomeLength"))
+                .setProcreationEnergy(options.get("animalBreedEnergy"))
+                .setEnergyFromGrass(options.get("grassEnergy"))
+                .setFullEnergy(options.get("animalFullEnergy"))
+                .setNumberOfMutations(options.get("minMutations"));
+
         this.worldMap = new Globe(options.get("mapWidth"),
                 options.get("mapHeight"),
                 options.get("grassStartingNumber"),
                 options.get("grassRegeneration"),
                 options.get("grassGrowthVariant"),
-                options.get("mutationVariant"));
+                options.get("mutationVariant"),
+                animalBuilder);
+
         worldMap.addListener(this);
 
         Simulation simulation = new Simulation(new simulationBuilder()
@@ -39,12 +46,9 @@ public class SimulationPresenter implements MapChangeListener {
                 .setStartingGrass(options.get("grassStartingNumber"))
                 .setNewGrass(options.get("grassRegeneration"))
                 .setStartEnergy(options.get("animalStartingEnergy"))
-                .setEnergyFromGrass(options.get("grassEnergy"))
-                .setFullEnergy(options.get("animalFullEnergy"))
-                .setProcreationEnergy(options.get("animalBreedEnergy"))
-                .setNumberOfMutations(options.get("minMutations"))
                 .setGenomeLength(options.get("genomeLength"))
                 .setFramePerSecond(options.get("framesPerSecond"))
+                .setAnimalBuilder(animalBuilder)
         );
         List<Simulation> simulationList = new ArrayList<>();
         Thread thread = new Thread(simulation);

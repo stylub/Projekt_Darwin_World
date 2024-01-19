@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static java.lang.Math.min;
+
 /**
  * This class is responsible for creating new animals from two parents
  * It also checks if two animals can procreate
  */
-public class NewAnimalCreator {
+public class Incubator {
 
     int mutationVariant;
     int genomeLength;
@@ -20,7 +22,7 @@ public class NewAnimalCreator {
      * 0 - random mutations only;
      * 1 - mutation can cause the genes to swap places;
      */
-    public NewAnimalCreator(int mutationVariant,AnimalBuilder animalConfiguration){
+    public Incubator(int mutationVariant,AnimalBuilder animalConfiguration){
         this.mutationVariant = mutationVariant;
         this.animalConfiguration = animalConfiguration;
         this.genomeLength = animalConfiguration.genomeLength;
@@ -28,7 +30,10 @@ public class NewAnimalCreator {
     }
 
     public Boolean canProcreate(Animal animal1, Animal animal2){
-        return animal1.isFull()  && animal2.isFull() && animal1.getPosition().equals(animal2.getPosition());
+        return animal1.isFull()  && animal2.isFull() &&
+                animal1.getPosition().equals(animal2.getPosition()) &&
+                animal1.getEnergy()>animalConfiguration.procreationEnergy &&
+                animal2.getEnergy()>animalConfiguration.procreationEnergy;
     }
     public Animal BornNewAnimal(Animal animal1,Animal animal2){
         int startEnergy = animal1.procreate() + animal2.procreate();
@@ -51,11 +56,12 @@ public class NewAnimalCreator {
         List<Integer> firstGenome = animal1.getGenome();
         List<Integer> secondGenome = animal2.getGenome();
         List<Integer> newGenome =  new ArrayList<>();
-
+        if(firstGenome.size() != secondGenome.size())
+            throw new IllegalArgumentException("Genomes are not the same size");
         double energyRatio = ((double) animal1.getEnergy()) / (animal2.getEnergy() + animal1.getEnergy());
 
 
-        int firstGenomeIndex = (int) (genomeLength * energyRatio);
+        int firstGenomeIndex = min((int) (genomeLength * energyRatio),genomeLength);
 
         for(int i = 0; i < firstGenomeIndex; i++){
             newGenome.add(firstGenome.get(i));

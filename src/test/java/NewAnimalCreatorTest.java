@@ -1,10 +1,10 @@
 import agh.ics.oop.model.Animal;
 import agh.ics.oop.model.AnimalBuilder;
-import agh.ics.oop.model.NewAnimalCreator;
+import agh.ics.oop.model.Incubator;
 import agh.ics.oop.model.Vector2d;
 import org.junit.jupiter.api.Test;
 
-public class NewAnimalCreatorTest {
+public class IncubatorTest {
 
     @Test
     void allRandomVariantTest(){
@@ -16,7 +16,7 @@ public class NewAnimalCreatorTest {
         animalBuilder.setGenomeLength(32);
         animalBuilder.setPosition(new Vector2d(2,2));
 
-        NewAnimalCreator procreate = new NewAnimalCreator(0,animalBuilder);
+        Incubator procreate = new Incubator(0,animalBuilder);
         Animal animal1 = animalBuilder.build();
         Animal animal2 = animalBuilder.build();
         Animal newAnimal = procreate.BornNewAnimal(animal1,animal2);
@@ -33,10 +33,10 @@ public class NewAnimalCreatorTest {
         animalBuilder.setGenomeLength(32);
         animalBuilder.setPosition(new Vector2d(2,2));
 
-        NewAnimalCreator procreate = new NewAnimalCreator(1,animalBuilder);
+        Incubator incubator = new Incubator(1,animalBuilder);
         Animal animal1 = animalBuilder.build();
         Animal animal2 = animalBuilder.build();
-        Animal newAnimal = procreate.BornNewAnimal(animal1,animal2);
+        Animal newAnimal = incubator.BornNewAnimal(animal1,animal2);
 
         assert newAnimal.getEnergy() == 100;
     }

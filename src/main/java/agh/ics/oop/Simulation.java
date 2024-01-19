@@ -24,26 +24,17 @@ public class Simulation implements Runnable{
         this.animalList = new ArrayList<>();
         this.toPlaceList = new ArrayList<>();
         this.timeBetweenFrames = 1000 / builder.framePerSecond;
+        this.animalBuilder = builder.animalBuilder;
 
         RandomPositionGenerator positionGenerator = new RandomPositionGenerator(map.getCurrentBounds(),staringAnimals);
         for(var pos : positionGenerator){
             toPlaceList.add(pos);
         }
-
-        animalBuilder = new AnimalBuilder()
-                .setEnergy(builder.startEnergy)
-                .setGenomeLength(builder.GenomeLength)
-                .setProcreationEnergy(builder.procreationEnergy)
-                .setEnergyFromGrass(builder.energyFromGrass)
-                .setFullEnergy(builder.fullEnergy)
-                .setNumberOfMutations(builder.numberOfMutations);
-
-        this.map.setAnimalConfiguration(animalBuilder);
     }
     @Override
     public void run(){
         initialize();
-        for(int i =0;i<howLong;i++){
+        while (true){
             map.update();
             try {
                 Thread.sleep(timeBetweenFrames);

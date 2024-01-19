@@ -18,6 +18,7 @@ public class Globe implements WorldMap{
     private final List<MapChangeListener> observers = new ArrayList<>();
     private final int grassVariant;
     private final int mutationVariant;
+    Incubator incubator;
 
     private BigInteger numberOfDeadAnimals = BigInteger.ZERO;
     private BigInteger deadAnimalsSumOfLivedDays = BigInteger.ZERO;
@@ -28,10 +29,12 @@ public class Globe implements WorldMap{
         }
     }
 
-    public Globe(int width,int height,int startingGrass, int newGrass,int grassVariant,int mutationVariant){
+    public Globe(int width,int height,int startingGrass, int newGrass,int grassVariant,int mutationVariant,AnimalBuilder animalConfiguration){
         this.newGrass = newGrass;
         this.grassVariant = grassVariant;
         this.mutationVariant = mutationVariant;
+        this.animalConfiguration = animalConfiguration;
+        incubator = new Incubator(0,animalConfiguration);
         boundary = new Boundary(new Vector2d(0, 0), new Vector2d(width, height));
         this.grassGenerator = new GrassGenerator(width + 1,height + 1,startingGrass,0.8);
         for(var pos : grassGenerator){
@@ -218,7 +221,7 @@ public class Globe implements WorldMap{
         if (animalsToProcreate.isEmpty()) {
             return;
         }
-        NewAnimalCreator newAnimalCreator = new NewAnimalCreator(0,animalConfiguration);
+
         for(var pos : animalsToProcreate){
             List<Animal> strongestAnimals = getStrongestAnimalsAtPosition(pos);
             if (strongestAnimals.size() < 2) {
@@ -226,8 +229,8 @@ public class Globe implements WorldMap{
             }
             Animal animal1 = strongestAnimals.get(0);
             Animal animal2 = strongestAnimals.get(1);
-            if(newAnimalCreator.canProcreate(animal1,animal2)){
-                Animal newAnimal = newAnimalCreator.BornNewAnimal(animal1,animal2);
+            if(incubator.canProcreate(animal1,animal2)){
+                Animal newAnimal = incubator.BornNewAnimal(animal1,animal2);
                 place(newAnimal);
             }
         }
