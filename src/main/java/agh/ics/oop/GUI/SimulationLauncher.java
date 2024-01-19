@@ -45,6 +45,8 @@ public class SimulationLauncher {
     @FXML
     private Spinner<Integer> animalBreedEnergy;
     @FXML
+    private Spinner<Integer> framesPerSecond;
+    @FXML
     public void launchSimulation() throws IOException {
 //        Update options to pass them into presenter
         updateOptions();
@@ -80,5 +82,16 @@ public class SimulationLauncher {
         options.put("animalStartingEnergy", animalStartingEnergy.getValue());
         options.put("animalFullEnergy", animalFullEnergy.getValue());
         options.put("animalBreedEnergy", animalBreedEnergy.getValue());
+        options.put("framesPerSecond", framesPerSecond.getValue());
+        options.put("mutationVariant", mutationVariant.getValue().equals("Domyślny") ? 0 : 1);
+        options.put("grassGrowthVariant", grassGrowthVariant.getValue().equals("Domyślny") ? 0 : 1);
+    }
+    @FXML
+    private void loadConfig(){
+
+    }
+    @FXML
+    private void saveConfig(){
+        
     }
 }
