@@ -16,12 +16,14 @@ public class Simulation implements Runnable{
     int howLong;
     int staringAnimals;
     AnimalBuilder animalBuilder;
+    int timeBetweenFrames;
     public Simulation(simulationBuilder builder){
         this.map = builder.map;
         this.howLong = builder.howLong;
         this.staringAnimals = builder.staringAnimals;
         this.animalList = new ArrayList<>();
         this.toPlaceList = new ArrayList<>();
+        this.timeBetweenFrames = 1000 / builder.framePerSecond;
 
         RandomPositionGenerator positionGenerator = new RandomPositionGenerator(map.getCurrentBounds(),staringAnimals);
         for(var pos : positionGenerator){
@@ -44,7 +46,7 @@ public class Simulation implements Runnable{
         for(int i =0;i<howLong;i++){
             map.update();
             try {
-                Thread.sleep(500);
+                Thread.sleep(timeBetweenFrames);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

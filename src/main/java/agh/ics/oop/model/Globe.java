@@ -15,6 +15,8 @@ public class Globe implements WorldMap{
     private final Set<Vector2d> animalsToProcreate = new HashSet<>();
     GrassGenerator grassGenerator;
     private final List<MapChangeListener> observers = new ArrayList<>();
+    private final int grassVariant;
+    private final int mutationVariant;
 
     public void notifyObservers(String description) {
         for (MapChangeListener observer : observers) {
@@ -22,8 +24,10 @@ public class Globe implements WorldMap{
         }
     }
 
-    public Globe(int width,int height,int startingGrass, int newGrass){
+    public Globe(int width,int height,int startingGrass, int newGrass,int grassVariant,int mutationVariant){
         this.newGrass = newGrass;
+        this.grassVariant = grassVariant;
+        this.mutationVariant = mutationVariant;
         boundary = new Boundary(new Vector2d(0, 0), new Vector2d(width, height));
         this.grassGenerator = new GrassGenerator(width + 1,height + 1,startingGrass,0.8);
         for(var pos : grassGenerator){
