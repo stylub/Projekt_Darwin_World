@@ -19,7 +19,7 @@ public class IncubatorTest {
         Incubator procreate = new Incubator(0,animalBuilder);
         Animal animal1 = animalBuilder.build();
         Animal animal2 = animalBuilder.build();
-        Animal newAnimal = procreate.BornNewAnimal(animal1,animal2);
+        Animal newAnimal = procreate.BornNewAnimal(animal1,animal2,0);
 
         assert newAnimal.getEnergy() == 100;
     }
@@ -36,7 +36,7 @@ public class IncubatorTest {
         Incubator incubator = new Incubator(1,animalBuilder);
         Animal animal1 = animalBuilder.build();
         Animal animal2 = animalBuilder.build();
-        Animal newAnimal = incubator.BornNewAnimal(animal1,animal2);
+        Animal newAnimal = incubator.BornNewAnimal(animal1,animal2,0);
 
         assert newAnimal.getEnergy() == 100;
     }

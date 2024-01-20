@@ -35,15 +35,21 @@ public class Incubator {
                 animal1.getEnergy()>animalConfiguration.procreationEnergy &&
                 animal2.getEnergy()>animalConfiguration.procreationEnergy;
     }
-    public Animal BornNewAnimal(Animal animal1,Animal animal2){
+    public Animal BornNewAnimal(Animal animal1,Animal animal2,int day){
         int startEnergy = animal1.procreate() + animal2.procreate();
         Vector2d position = animal1.getPosition();
         List<Integer> genome = getNewGenome(animal1,animal2);
-        return animalConfiguration
+        Animal newAnimal = animalConfiguration
                 .setEnergy(startEnergy)
                 .setGenome(genome)
                 .setPosition(position)
+                .setBornDay(day)
+                .setFirstParent(animal1)
+                .setSecondParent(animal2)
                 .build();
+        animal1.addDescendant(newAnimal);
+        animal2.addDescendant(newAnimal);
+        return newAnimal;
     }
 
     public List<Integer> getNewGenome(Animal animal1, Animal animal2){

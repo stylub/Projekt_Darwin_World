@@ -6,25 +6,15 @@ import agh.ics.oop.model.Globe;
 public class simulationBuilder {
     public AnimalBuilder animalBuilder;
     Globe map;
-    int howLong;
     int staringAnimals;
     int startingGrass;
     int newGrass;
     int startEnergy;
-    int energyFromGrass;
-    int fullEnergy;
-    int procreationEnergy;
-    int numberOfMutations;
     int GenomeLength;
     int framePerSecond = 2;
 
     public simulationBuilder setMap(Globe map) {
         this.map = map;
-        return this;
-    }
-
-    public simulationBuilder setHowLong(int howLong) {
-        this.howLong = howLong;
         return this;
     }
 
@@ -35,26 +25,6 @@ public class simulationBuilder {
 
     public simulationBuilder setStartEnergy(int startEnergy) {
         this.startEnergy = startEnergy;
-        return this;
-    }
-
-    public simulationBuilder setEnergyFromGrass(int energyFromGrass) {
-        this.energyFromGrass = energyFromGrass;
-        return this;
-    }
-
-    public simulationBuilder setFullEnergy(int fullEnergy) {
-        this.fullEnergy = fullEnergy;
-        return this;
-    }
-
-    public simulationBuilder setProcreationEnergy(int procreationEnergy) {
-        this.procreationEnergy = procreationEnergy;
-        return this;
-    }
-
-    public simulationBuilder setNumberOfMutations(int numberOfMutations) {
-        this.numberOfMutations = numberOfMutations;
         return this;
     }
 
@@ -78,6 +48,7 @@ public class simulationBuilder {
         this.animalBuilder = animalBuilder;
         return this;
     }
+
     public Simulation build() {
         return new Simulation(this);
     }

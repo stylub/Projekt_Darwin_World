@@ -13,13 +13,13 @@ public class Simulation implements Runnable{
     List<Animal> animalList;
     List<Vector2d> toPlaceList;
     Globe map;
-    int howLong;
     int staringAnimals;
     AnimalBuilder animalBuilder;
     int timeBetweenFrames;
+    boolean isRunning = true;
+
     public Simulation(simulationBuilder builder){
         this.map = builder.map;
-        this.howLong = builder.howLong;
         this.staringAnimals = builder.staringAnimals;
         this.animalList = new ArrayList<>();
         this.toPlaceList = new ArrayList<>();
@@ -35,11 +35,22 @@ public class Simulation implements Runnable{
     public void run(){
         initialize();
         while (true){
-            map.update();
-            try {
-                Thread.sleep(timeBetweenFrames);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            if(isRunning) {
+                map.update();
+                try {
+                    Thread.sleep(timeBetweenFrames);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            else{
+                System.out.println("Simulation paused...");
+                try {
+                    // Sleep to reduce CPU usage
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
         }
     }
@@ -51,8 +62,14 @@ public class Simulation implements Runnable{
 
             Random random = new Random();
             newAnimal.rotate(random.nextInt(8));
-            map.place(newAnimal);
+            map.addAnimal(newAnimal);
         }
+    }
+    public void pause(){
+        isRunning = false;
+    }
+    public void resume(){
+        isRunning = true;
     }
 }
 

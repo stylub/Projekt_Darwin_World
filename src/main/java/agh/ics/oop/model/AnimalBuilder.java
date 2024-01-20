@@ -14,9 +14,16 @@ public class AnimalBuilder {
     public int fullEnergy;
     public int numberOfMutations;
     public int genomeLength;
+    public int bornDay;
+    public Animal parent1;
+    public Animal parent2;
 
     public AnimalBuilder setPosition(Vector2d position) {
         this.position = position;
+        return this;
+    }
+    public AnimalBuilder setBornDay(int bornDay) {
+        this.bornDay = bornDay;
         return this;
     }
     public AnimalBuilder setGenome(List<Integer> genome) {
@@ -46,6 +53,14 @@ public class AnimalBuilder {
     }
     public AnimalBuilder setNumberOfMutations(int numberOfMutations) {
         this.numberOfMutations = numberOfMutations;
+        return this;
+    }
+    public AnimalBuilder setFirstParent(Animal parent1) {
+        this.parent1 = parent1;
+        return this;
+    }
+    public AnimalBuilder setSecondParent(Animal parent2) {
+        this.parent2 = parent2;
         return this;
     }
     public Animal build() {

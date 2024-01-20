@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+
 public class SimulationPresenter implements MapChangeListener {
     @FXML
     private GridPane mapGrid;
@@ -33,7 +34,7 @@ public class SimulationPresenter implements MapChangeListener {
                 options.get("mapHeight"),
                 options.get("grassStartingNumber"),
                 options.get("grassRegeneration"),
-                options.get("grassGrowthVariant"),
+                GrassVariant.getVariantByValue(options.get("grassGrowthVariant")),
                 options.get("mutationVariant"),
                 animalBuilder);
 
@@ -41,7 +42,6 @@ public class SimulationPresenter implements MapChangeListener {
 
         Simulation simulation = new Simulation(new simulationBuilder()
                 .setMap(worldMap)
-                .setHowLong(100)
                 .setStaringAnimals(options.get("animalStartingNumber"))
                 .setStartingGrass(options.get("grassStartingNumber"))
                 .setNewGrass(options.get("grassRegeneration"))

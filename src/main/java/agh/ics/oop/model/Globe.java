@@ -10,15 +10,15 @@ public class Globe implements WorldMap{
     private final Map<Vector2d, List<Animal>> animals = new HashMap<>();
     private final Map<Vector2d,Grass> grass = new HashMap<>();
     private final UUID id = UUID.randomUUID();
-    private final int newGrass;
-    private AnimalBuilder animalConfiguration;
     private final Set<Vector2d> grassToEat = new HashSet<>();
     private final Set<Vector2d> animalsToProcreate = new HashSet<>();
     GrassGenerator grassGenerator;
     private final List<MapChangeListener> observers = new ArrayList<>();
-    private final int grassVariant;
-    private final int mutationVariant;
+    private final HashMap<List<Integer>,Integer> countGenome = new HashMap<>();
+    private final  Queue<Animal> recentlyDeadAnimals = new ArrayDeque<Animal>();
+    private final int maxQueueSize;
     Incubator incubator;
+    int whichDay = 1;
 
     private BigInteger numberOfDeadAnimals = BigInteger.ZERO;
     private BigInteger deadAnimalsSumOfLivedDays = BigInteger.ZERO;
@@ -28,23 +28,20 @@ public class Globe implements WorldMap{
             observer.mapChanged(this,description);
         }
     }
+    @Override
+    public void addListener(MapChangeListener listener) {
+        this.observers.add(listener);
+    }
 
-    public Globe(int width,int height,int startingGrass, int newGrass,int grassVariant,int mutationVariant,AnimalBuilder animalConfiguration){
-        this.newGrass = newGrass;
-        this.grassVariant = grassVariant;
-        this.mutationVariant = mutationVariant;
-        this.animalConfiguration = animalConfiguration;
-        incubator = new Incubator(0,animalConfiguration);
+    public Globe(int width,int height,int startingGrass, int newGrass,GrassVariant grassVariant,int mutationVariant,AnimalBuilder animalConfiguration){
+        incubator = new Incubator(mutationVariant,animalConfiguration);
         boundary = new Boundary(new Vector2d(0, 0), new Vector2d(width, height));
-        this.grassGenerator = new GrassGenerator(width + 1,height + 1,startingGrass,0.8);
+        maxQueueSize = (width * height) / 8 ;
+        this.grassGenerator = new GrassGenerator(width + 1,height + 1,startingGrass,0.8,grassVariant,newGrass,this);
         for(var pos : grassGenerator){
             grass.put(pos,new Grass(pos));
         }
     }
-    public void setAnimalConfiguration(AnimalBuilder animalConfiguration){
-        this.animalConfiguration = animalConfiguration;
-    }
-
     @Override
     public void place(Animal animal){
         if(!insideMap(animal.getPosition())){
@@ -90,14 +87,15 @@ public class Globe implements WorldMap{
 
     public void forward(Animal animal) {
         this.remove(animal);
-        //Vector2d oldPosition = animal.getPosition();
+        Vector2d oldPosition = animal.getPosition();
         Vector2d newPosition = animal.forward();
         if(!insideMap(newPosition)){
             newPosition = wrap(newPosition);
-//            if(newPosition.equals(oldPosition))
-//                rotate(animal,4);
-//            else
-                animal.moveTo(newPosition);
+
+            if(newPosition.equals(oldPosition))
+                rotate(animal,4);
+
+            animal.moveTo(newPosition);
 
         }
         this.place(animal);
@@ -140,11 +138,6 @@ public class Globe implements WorldMap{
     }
 
     @Override
-    public void addListener(MapChangeListener listener) {
-        this.observers.add(listener);
-    }
-
-    @Override
     public void removeListener(MapChangeListener listener) {
         this.observers.remove(listener);
     }
@@ -159,7 +152,7 @@ public class Globe implements WorldMap{
     }
 
     public void growGrass(){
-        grassGenerator.generateNewPositions(this.newGrass,grass);
+        grassGenerator.generateNewPositions();
         for(var pos : grassGenerator){
             grass.put(pos,new Grass(pos));
         }
@@ -170,9 +163,7 @@ public class Globe implements WorldMap{
         List<Animal> aliveAnimals = new ArrayList<>();
         for (Animal animal : animalsToUpdate) {
             if (animal.isDead()) {
-                remove(animal);
-                numberOfDeadAnimals = numberOfDeadAnimals.add(BigInteger.ONE);
-                deadAnimalsSumOfLivedDays = deadAnimalsSumOfLivedDays.add(BigInteger.valueOf(animal.getAge()));
+                deleteAnimal(animal);
             }
             else{
                 aliveAnimals.add(animal);
@@ -193,9 +184,31 @@ public class Globe implements WorldMap{
         procreate();
         growGrass();
         notifyObservers("Number of Animals now: " + getAllAnimals().size());
+        whichDay += 1;
     }
 
-    private List<Animal> getAllAnimals(){
+    public void addAnimal(Animal animal){
+        place(animal);
+        addGenome(animal.getGenome());
+    }
+    private void deleteAnimal(Animal animal){
+        remove(animal);
+        recentlyDeadAnimals.offer(animal);
+        if(recentlyDeadAnimals.size() > maxQueueSize){
+            recentlyDeadAnimals.poll();
+        }
+        removeGenome(animal.getGenome());
+        numberOfDeadAnimals = numberOfDeadAnimals.add(BigInteger.ONE);
+        deadAnimalsSumOfLivedDays = deadAnimalsSumOfLivedDays.add(BigInteger.valueOf(animal.getAge()));
+    }
+
+    public Animal getAnimal(Vector2d position){
+        if(!animals.containsKey(position)){
+            return null;
+        }
+        return getStrongestAnimalsAtPosition(position).get(0);
+    }
+    public List<Animal> getAllAnimals(){
         List<Animal> allAnimals = new ArrayList<>();
         for(List<Animal> list : animals.values()){
             allAnimals.addAll(list);
@@ -206,6 +219,10 @@ public class Globe implements WorldMap{
         List<Animal> strongestAnimals = animals.get(position);
         strongestAnimals.sort(Collections.reverseOrder());
         return strongestAnimals;
+    }
+
+    public Map<Vector2d,Grass> getGrass(){
+        return grass;
     }
 
     private void eatGrass(){
@@ -230,66 +247,69 @@ public class Globe implements WorldMap{
             Animal animal1 = strongestAnimals.get(0);
             Animal animal2 = strongestAnimals.get(1);
             if(incubator.canProcreate(animal1,animal2)){
-                Animal newAnimal = incubator.BornNewAnimal(animal1,animal2);
-                place(newAnimal);
+                Animal newAnimal = incubator.BornNewAnimal(animal1,animal2,whichDay);
+                addAnimal(newAnimal);
             }
         }
         animalsToProcreate.clear();
     }
-    public Integer getNumberOfAnimals(){
-        return getAllAnimals().size();
-    }
-    public Integer getNumberOfGrass(){
-        return grass.values().size();
-    }
-    public Double getAverageEnergy(){
-        List<Animal> allAnimals = getAllAnimals();
-        if(allAnimals.isEmpty()){
+    public Double getAverageLifeSpan(){
+        if(numberOfDeadAnimals.equals(BigInteger.ZERO)){
             return 0.0;
         }
-        int sum = 0;
-        for (Animal animal : allAnimals) {
-            sum += animal.getEnergy();
-        }
-        return (double) sum / allAnimals.size();
+        return deadAnimalsSumOfLivedDays.doubleValue() / numberOfDeadAnimals.doubleValue();
     }
-    public Integer getNumberOfFreePositions(){
-        int freePositions = 0;
-        int width = boundary.rightTop().getX();
-        int height = boundary.rightTop().getY();
-        for(int i = 0;i<=width;i++){
-            for(int j = 0;j<=height;j++){
-                Vector2d position = new Vector2d(i,j);
-                if(!isOccupied(position)){
-                    freePositions += 1;
-                }
+    private void addGenome(List<Integer> genome){
+        if(countGenome.containsKey(genome)){
+            countGenome.put(genome,countGenome.get(genome) + 1);
+        }
+        else{
+            countGenome.put(genome,1);
+        }
+    }
+    private void removeGenome(List<Integer> genome){
+        if(countGenome.containsKey(genome)){
+            countGenome.put(genome,countGenome.get(genome) - 1);
+        }
+        if (countGenome.get(genome) == 0) {
+            countGenome.remove(genome);
+        }
+    }
+    public List<Integer> getMostPopularGenome() {
+        if (countGenome.isEmpty()) {
+            return null;
+        }
+
+        List<Integer> mostPopularGenome = null;
+        int maxOccurrence = 0;
+
+        for (Map.Entry<List<Integer>, Integer> entry : countGenome.entrySet()) {
+            List<Integer> currentGenome = entry.getKey();
+            int currentOccurrence = entry.getValue();
+
+            if (currentOccurrence > maxOccurrence) {
+                mostPopularGenome = currentGenome;
+                maxOccurrence = currentOccurrence;
             }
         }
-        return freePositions;
+
+        return mostPopularGenome;
     }
-    public Double getAverageNumberOfChildren(){
-        List<Animal> allAnimals = getAllAnimals();
-        if(allAnimals.isEmpty()){
-            return 0.0;
+    public List<Animal> getAnimalsWithDominatingGenome(){
+        List<Animal> animalsWithDominatingGenome = new ArrayList<>();
+        List<Integer> dominatingGenome = getMostPopularGenome();
+        if(dominatingGenome == null){
+            return animalsWithDominatingGenome;
         }
-        int sum = 0;
-        for (Animal animal : allAnimals) {
-            sum += animal.getNumberOfChildren();
+        for(Animal animal : getAllAnimals()){
+            if(animal.getGenome().equals(dominatingGenome)){
+                animalsWithDominatingGenome.add(animal);
+            }
         }
-        return (double)sum / allAnimals.size();
+        return animalsWithDominatingGenome;
     }
-    public HashMap<String,String> getMapStatistics(){
-        HashMap<String,String> mapStatistics = new HashMap<>();
-        mapStatistics.put("numberOfAnimals",getNumberOfAnimals().toString());
-        mapStatistics.put("numberOfGrass",getNumberOfGrass().toString());
-        mapStatistics.put("numberOfFreePositions",getNumberOfFreePositions().toString());
-        mapStatistics.put("averageEnergy",getAverageEnergy().toString());
-        mapStatistics.put("averageNumberOfChildren",getAverageNumberOfChildren().toString());
-        Double averageLivedDays = 0.0;
-        if(numberOfDeadAnimals.compareTo(BigInteger.ZERO) != 0){
-            averageLivedDays = deadAnimalsSumOfLivedDays.divide(numberOfDeadAnimals).doubleValue();
-        }
-        mapStatistics.put("averageLivedDays",averageLivedDays.toString());
-        return mapStatistics;
+    public List<Vector2d> getPreferredPositions(){
+        return grassGenerator.getPreferredPositions();
     }
+
 }
