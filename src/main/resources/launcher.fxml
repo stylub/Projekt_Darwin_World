@@ -121,6 +121,7 @@
                   <ComboBox fx:id="mutationVariant" prefWidth="150.0" value="Domyślny">
                    <items>
                        <FXCollections fx:factory="observableArrayList">
+
                            <String fx:value="Domyślny" fx:id="defaultMutation"/>
                            <String fx:value="Podmianka" fx:id="substitutionMutation"/>
                        </FXCollections>

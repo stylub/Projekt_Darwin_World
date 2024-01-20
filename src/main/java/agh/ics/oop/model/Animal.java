@@ -7,25 +7,24 @@ import java.util.*;
 public class Animal implements  WorldElement, Comparable<Animal>{
     private final UUID id = UUID.randomUUID();
     private MapDirection direction = MapDirection.NORTH;
-    public Vector2d position;
-    public List<Integer> genome;
-    public int procreationEnergy;
-    public int energyFromGrass;
-    public int fullEnergy;
-    public int numberOfMutations;
+    private Vector2d position;
+    private final List<Integer> genome;
+    private final AnimalBuilder animalConfiguration;
     private int energy;
     private int numberOfChildren = 0;
-    private int numberOfDescendants = 0;
     private int age = 0;
+    private int numberOfGrassEaten = 0;
+    private int bornDay = 0;
     private int activeGene;
+    Parents parents = null;
+    HashSet<Animal> descendants = new HashSet<>();
     public Animal(AnimalBuilder builder){
+        this.animalConfiguration = builder;
+        this.bornDay = builder.bornDay;
         this.position = builder.position;
         this.energy = builder.energy;
-        this.fullEnergy = builder.fullEnergy;
-        this.procreationEnergy = builder.procreationEnergy;
-        this.energyFromGrass = builder.energyFromGrass;
-        this.numberOfMutations = builder.numberOfMutations;
-
+        this.parents = new Parents(builder.parent1,builder.parent2);
+        parents.noticeOfChild(this,parents);
         if (builder.genome == null) {
             Random random = new Random();
             this.genome = new ArrayList<>();
@@ -54,14 +53,16 @@ public class Animal implements  WorldElement, Comparable<Animal>{
         return  this.position.equals(position);
     }
 
-    public void rotate(int directionChange){
-        for(int i =0;i<directionChange;i++)
-            direction = direction.next();
-    }
     public void rotate(){
-        activeGene = activeGene % genome.size();
-        rotate(genome.get(activeGene));
+        direction = direction.rotate(genome.get(getActiveGene()));
         activeGene++;
+    }
+    public int getActiveGene(){
+        activeGene = activeGene % genome.size();
+        return activeGene;
+    }
+    public void rotate(int rotation){
+        direction = direction.rotate(rotation);
     }
     public Vector2d forward(){
         Vector2d newPosition = position.add(direction.toUnitVector());
@@ -83,6 +84,9 @@ public class Animal implements  WorldElement, Comparable<Animal>{
     public int getAge(){
         return age;
     }
+    public int getBornDay(){
+        return bornDay;
+    }
     public int getNumberOfChildren(){
         return numberOfChildren;
     }
@@ -94,7 +98,8 @@ public class Animal implements  WorldElement, Comparable<Animal>{
         return energy <= 0;
     }
     public void eatGrass(){
-        this.energy += this.energyFromGrass;
+        this.energy += this.animalConfiguration.energyFromGrass;
+        this.numberOfGrassEaten += 1;
     }
     public UUID getId(){
         return id;
@@ -118,23 +123,65 @@ public class Animal implements  WorldElement, Comparable<Animal>{
             return Integer.compare(this.energy,o.energy);
     }
     public Boolean isFull(){
-        return this.energy >= this.fullEnergy;
+        return this.energy >= this.animalConfiguration.fullEnergy;
     }
     public int procreate(){
-        this.energy -= procreationEnergy;
+        this.energy -= this.animalConfiguration.procreationEnergy;
         this.numberOfChildren += 1;
-        return procreationEnergy;
+        return this.animalConfiguration.procreationEnergy;
     }
 
-    public void addDescendant(){
-        this.numberOfDescendants += 1;
+    public void addDescendant(Animal descendant){
+        descendants.add(descendant);
     }
     public int getNumberOfDescendants(){
-        return numberOfDescendants;
+        return descendants.size();
     }
     public List<Integer> getGenome(){
         return genome;
     }
 
+    public int getNumberOfGrassEaten(){
+        return numberOfGrassEaten;
+    }
+
+    private Parents parents(){
+        return parents;
+    }
+
+   private class Parents {
+       Animal parent1;
+       Animal parent2;
+
+       public Parents(Animal parent1, Animal parent2) {
+           this.parent1 = parent1;
+           this.parent2 = parent2;
+       }
+
+       public Animal getParent1() {
+           return parent1;
+       }
+
+       public Animal getParent2() {
+           return parent2;
+       }
+
+       public void noticeOfChild(Animal childrenInQuestion, Parents parents){
+            Animal parent1 = parents.getParent1();
+            Animal parent2 = parents.getParent2();
+
+             if(parent1 != null && !parent1.isDead()){
+                 parent1.addDescendant(childrenInQuestion);
+                 noticeOfChild(childrenInQuestion,parent1.parents());
+              }
+              if(parent2 != null && !parent2.isDead()){
+                parent2.addDescendant(childrenInQuestion);
+                noticeOfChild(childrenInQuestion,parent2.parents());
+              }
+       }
+   }
 }
+
+
+
 

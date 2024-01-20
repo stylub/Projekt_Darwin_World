@@ -13,42 +13,44 @@ public class Simulation implements Runnable{
     List<Animal> animalList;
     List<Vector2d> toPlaceList;
     Globe map;
-    int howLong;
     int staringAnimals;
     AnimalBuilder animalBuilder;
     int timeBetweenFrames;
+    boolean isRunning = true;
+
     public Simulation(simulationBuilder builder){
         this.map = builder.map;
-        this.howLong = builder.howLong;
         this.staringAnimals = builder.staringAnimals;
         this.animalList = new ArrayList<>();
         this.toPlaceList = new ArrayList<>();
         this.timeBetweenFrames = 1000 / builder.framePerSecond;
+        this.animalBuilder = builder.animalBuilder;
 
         RandomPositionGenerator positionGenerator = new RandomPositionGenerator(map.getCurrentBounds(),staringAnimals);
         for(var pos : positionGenerator){
             toPlaceList.add(pos);
         }
-
-        animalBuilder = new AnimalBuilder()
-                .setEnergy(builder.startEnergy)
-                .setGenomeLength(builder.GenomeLength)
-                .setProcreationEnergy(builder.procreationEnergy)
-                .setEnergyFromGrass(builder.energyFromGrass)
-                .setFullEnergy(builder.fullEnergy)
-                .setNumberOfMutations(builder.numberOfMutations);
-
-        this.map.setAnimalConfiguration(animalBuilder);
     }
     @Override
     public void run(){
         initialize();
-        for(int i =0;i<howLong;i++){
-            map.update();
-            try {
-                Thread.sleep(timeBetweenFrames);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+        while (true){
+            if(isRunning) {
+                map.update();
+                try {
+                    Thread.sleep(timeBetweenFrames);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            else{
+                System.out.println("Simulation paused...");
+                try {
+                    // Sleep to reduce CPU usage
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
         }
     }
@@ -60,8 +62,14 @@ public class Simulation implements Runnable{
 
             Random random = new Random();
             newAnimal.rotate(random.nextInt(8));
-            map.place(newAnimal);
+            map.addAnimal(newAnimal);
         }
+    }
+    public void pause(){
+        isRunning = false;
+    }
+    public void resume(){
+        isRunning = true;
     }
 }
 

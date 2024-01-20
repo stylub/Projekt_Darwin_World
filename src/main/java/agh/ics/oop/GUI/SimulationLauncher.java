@@ -49,7 +49,7 @@ public class SimulationLauncher {
     private Spinner<Integer> animalBreedEnergy;
     @FXML
     private Spinner<Integer> framesPerSecond;
-    @FXML
+     @FXML
     private TextField configName;
     @FXML
     private ArrayList<Spinner<Integer>> spinners;
@@ -61,8 +61,6 @@ public class SimulationLauncher {
     private String defaultMutation;
     @FXML
     private String substitutionMutation;
-
-
     @FXML
     public void launchSimulation() throws IOException {
 //        Update options to pass them into presenter

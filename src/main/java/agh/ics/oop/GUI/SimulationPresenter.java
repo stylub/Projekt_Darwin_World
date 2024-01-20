@@ -13,7 +13,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
