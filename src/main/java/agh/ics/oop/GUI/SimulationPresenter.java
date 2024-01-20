@@ -24,6 +24,7 @@ public class SimulationPresenter implements MapChangeListener {
     private Globe worldMap;
 
     public void initializeSimulation(HashMap<String, Integer> options) {
+        System.out.println(options.toString());
         this.worldMap = new Globe(options.get("mapWidth"),
                 options.get("mapHeight"),
                 options.get("grassStartingNumber"),
@@ -50,7 +51,6 @@ public class SimulationPresenter implements MapChangeListener {
         Thread thread = new Thread(simulation);
         thread.start();
     }
-
     @FXML
     public void drawMap() {
         clearGrid();
@@ -94,13 +94,11 @@ public class SimulationPresenter implements MapChangeListener {
             }
         }
     }
-
     private void clearGrid() {
         mapGrid.getChildren().retainAll(mapGrid.getChildren().get(0)); // hack to retain visible grid lines
         mapGrid.getColumnConstraints().clear();
         mapGrid.getRowConstraints().clear();
     }
-
     @Override
     public void mapChanged(WorldMap worldMap, String message) {
         Platform.runLater(this::drawMap);
