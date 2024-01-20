@@ -22,22 +22,14 @@ public class SimulationPresenter implements MapChangeListener {
     private Globe worldMap;
 
     public void initializeSimulation(HashMap<String, Integer> options) {
-        AnimalBuilder animalBuilder = new AnimalBuilder()
-                .setEnergy(options.get("animalStartingEnergy"))
-                .setGenomeLength(options.get("genomeLength"))
-                .setProcreationEnergy(options.get("animalBreedEnergy"))
-                .setEnergyFromGrass(options.get("grassEnergy"))
-                .setFullEnergy(options.get("animalFullEnergy"))
-                .setNumberOfMutations(options.get("minMutations"));
 
+        System.out.println(options.toString());
         this.worldMap = new Globe(options.get("mapWidth"),
                 options.get("mapHeight"),
                 options.get("grassStartingNumber"),
                 options.get("grassRegeneration"),
-                GrassVariant.getVariantByValue(options.get("grassGrowthVariant")),
-                options.get("mutationVariant"),
-                animalBuilder);
-
+                options.get("grassGrowthVariant"),
+                options.get("mutationVariant"));
         worldMap.addListener(this);
 
         Simulation simulation = new Simulation(new simulationBuilder()
@@ -48,13 +40,11 @@ public class SimulationPresenter implements MapChangeListener {
                 .setStartEnergy(options.get("animalStartingEnergy"))
                 .setGenomeLength(options.get("genomeLength"))
                 .setFramePerSecond(options.get("framesPerSecond"))
-                .setAnimalBuilder(animalBuilder)
         );
         List<Simulation> simulationList = new ArrayList<>();
         Thread thread = new Thread(simulation);
         thread.start();
     }
-
     @FXML
     public void drawMap() {
         clearGrid();
@@ -98,13 +88,11 @@ public class SimulationPresenter implements MapChangeListener {
             }
         }
     }
-
     private void clearGrid() {
         mapGrid.getChildren().retainAll(mapGrid.getChildren().get(0)); // hack to retain visible grid lines
         mapGrid.getColumnConstraints().clear();
         mapGrid.getRowConstraints().clear();
     }
-
     @Override
     public void mapChanged(WorldMap worldMap, String message) {
         Platform.runLater(this::drawMap);

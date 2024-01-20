@@ -5,5 +5,4 @@ Numer grupy i godzina zajęć: GR nr 3, PT 08:00
 
 # TO DO:
 * Zdechłe truchła
-* Zapisywanie konfiguracji do pliku
 * Zapisywanie danych z symulacji do pliku

@@ -8,6 +8,7 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -82,8 +83,8 @@
                   <ComboBox fx:id="grassGrowthVariant" prefWidth="150.0" value="Domyślny" visibleRowCount="2">
                       <items>
                           <FXCollections fx:factory="observableArrayList">
-                              <String fx:value="Domyślny" />
-                              <String fx:value="Życiodajne Truchła" />
+                              <String fx:value="Domyślny" fx:id="defaultGrassGrowth"/>
+                              <String fx:value="ŻyciodajneTruchła" fx:id="deadAnimalGrassGrowth"/>
                           </FXCollections>
                       </items>
                   </ComboBox>
@@ -120,8 +121,9 @@
                   <ComboBox fx:id="mutationVariant" prefWidth="150.0" value="Domyślny">
                    <items>
                        <FXCollections fx:factory="observableArrayList">
-                           <String fx:value="Domyślny" />
-                           <String fx:value="Podmianka" />
+
+                           <String fx:value="Domyślny" fx:id="defaultMutation"/>
+                           <String fx:value="Podmianka" fx:id="substitutionMutation"/>
                        </FXCollections>
                    </items>
                   </ComboBox>
@@ -165,11 +167,17 @@
          </children>
       </HBox>
       <Separator prefHeight="0.0" prefWidth="640.0" />
-      <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+      <HBox alignment="CENTER" prefHeight="0.0" prefWidth="640.0" VBox.vgrow="ALWAYS">
          <children>
-            <Button mnemonicParsing="false" onAction="#launchSimulation" prefHeight="64.0" prefWidth="168.0" text="Zapisz konfigurację" HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" onAction="#loadConfig" prefHeight="64.0" prefWidth="168.0" text="Załaduj kofigurację z pliku" HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" onAction="#saveConfig" prefHeight="64.0" prefWidth="168.0" text="Rozpocznij symulację" HBox.hgrow="ALWAYS" />
+            <VBox alignment="CENTER" prefHeight="198.0" prefWidth="177.0">
+               <children>
+                  <Label text="Nazwa pliku z konfiguracją" />
+                  <TextField fx:id="configName" />
+                  <Button mnemonicParsing="false" onAction="#saveConfig" prefHeight="20.0" prefWidth="177.0" text="Zapisz konfigurację" />
+                  <Button mnemonicParsing="false" onAction="#loadConfig" prefHeight="0.0" prefWidth="177.0" text="Załaduj kofigurację z pliku" />
+               </children>
+            </VBox>
+            <Button mnemonicParsing="false" onAction="#launchSimulation" prefHeight="93.0" prefWidth="168.0" text="Rozpocznij symulację" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
   </children>
