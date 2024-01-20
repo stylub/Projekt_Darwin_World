@@ -1,7 +1,10 @@
 package agh.ics.oop.GUI;
 
 import agh.ics.oop.Simulation;
-import agh.ics.oop.model.*;
+import agh.ics.oop.model.Globe;
+import agh.ics.oop.model.MapChangeListener;
+import agh.ics.oop.model.Vector2d;
+import agh.ics.oop.model.WorldMap;
 import agh.ics.oop.simulationBuilder;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -10,11 +13,9 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 
 public class SimulationPresenter implements MapChangeListener {
     @FXML
@@ -22,7 +23,6 @@ public class SimulationPresenter implements MapChangeListener {
     private Globe worldMap;
 
     public void initializeSimulation(HashMap<String, Integer> options) {
-
         System.out.println(options.toString());
         this.worldMap = new Globe(options.get("mapWidth"),
                 options.get("mapHeight"),
@@ -34,10 +34,15 @@ public class SimulationPresenter implements MapChangeListener {
 
         Simulation simulation = new Simulation(new simulationBuilder()
                 .setMap(worldMap)
+                .setHowLong(100)
                 .setStaringAnimals(options.get("animalStartingNumber"))
                 .setStartingGrass(options.get("grassStartingNumber"))
                 .setNewGrass(options.get("grassRegeneration"))
                 .setStartEnergy(options.get("animalStartingEnergy"))
+                .setEnergyFromGrass(options.get("grassEnergy"))
+                .setFullEnergy(options.get("animalFullEnergy"))
+                .setProcreationEnergy(options.get("animalBreedEnergy"))
+                .setNumberOfMutations(options.get("minMutations"))
                 .setGenomeLength(options.get("genomeLength"))
                 .setFramePerSecond(options.get("framesPerSecond"))
         );
