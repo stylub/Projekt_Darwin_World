@@ -31,10 +31,7 @@ public class FollowAnimal {
     public HashMap<String,String> getAnimalInfo(){
         HashMap<String,String> animalInfo = new HashMap<>();
         if(isFollowingAnimal){
-            String genome = animal.getGenome().toString();
-            int activeGene = animal.getActiveGene();
-            genome = genome.substring(0,activeGene) + "[" + genome.charAt(activeGene) + "]" + genome.substring(activeGene+1);
-            animalInfo.put("genome",genome);
+            animalInfo.put("genome",showGenome());
             animalInfo.put("grassEaten",String.valueOf(animal.getNumberOfGrassEaten()));
             animalInfo.put("energy",String.valueOf(animal.getEnergy()));
             animalInfo.put("children",String.valueOf(animal.getNumberOfChildren()));
@@ -43,6 +40,15 @@ public class FollowAnimal {
             animalInfo.put("dayOfDeath",String.valueOf(animal.getBornDay() + animal.getAge()));
         }
         return animalInfo;
+    }
+    private String showGenome(){
+        StringBuilder genome = new StringBuilder();
+        for(int gene : animal.getGenome()){
+            genome.append(gene).append(" ");
+        }
+        String gen = genome.toString();
+        int activeGene = animal.getActiveGene() * 2;
+        return gen.substring(0,activeGene) + "[" + gen.charAt(activeGene) + "]" + gen.substring(activeGene+1);
     }
     public boolean isFollowing(){
         return this.isFollowingAnimal;

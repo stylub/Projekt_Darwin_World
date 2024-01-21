@@ -44,12 +44,11 @@ public class Simulation implements Runnable{
                 }
             }
             else{
-                System.out.println("Simulation paused...");
                 try {
                     // Sleep to reduce CPU usage
-                    Thread.sleep(100);
+                    Thread.sleep(timeBetweenFrames);
                 } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+                    throw new RuntimeException(e);
                 }
             }
         }
