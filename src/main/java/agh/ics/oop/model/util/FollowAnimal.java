@@ -14,8 +14,8 @@ public class FollowAnimal {
     public FollowAnimal(Globe globe){
         this.globe = globe;
     }
-    public boolean startFollowing(Vector2d position){
-        Animal animal = globe.getAnimal(position);
+    public boolean startFollowing(int x, int y){
+        Animal animal = globe.getAnimal(new Vector2d(x,y));
         if(animal != null){
             this.animal = animal;
             isFollowingAnimal = true;
@@ -43,5 +43,8 @@ public class FollowAnimal {
             animalInfo.put("dayOfDeath",String.valueOf(animal.getBornDay() + animal.getAge()));
         }
         return animalInfo;
+    }
+    public boolean isFollowing(){
+        return this.isFollowingAnimal;
     }
 }

@@ -2,22 +2,67 @@ package agh.ics.oop.GUI;
 
 import agh.ics.oop.Simulation;
 import agh.ics.oop.model.*;
+import agh.ics.oop.model.util.FollowAnimal;
+import agh.ics.oop.model.util.SimulationStatistics;
 import agh.ics.oop.simulationBuilder;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.shape.Circle;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 public class SimulationPresenter implements MapChangeListener {
     @FXML
+    private Label followGenome;
+    @FXML
+    private Label followEnergy;
+    @FXML
+    private Label eatenGrass;
+    @FXML
+    private Label followChildren;
+    @FXML
+    private Label followDescendants;
+    @FXML
+    private Label followLifetime;
+    @FXML
+    private Label followDeath;
+    @FXML
+    private Button showStrongest;
+    @FXML
+    private Button showPrefferedFields;
+    @FXML
+    private Button save;
+    @FXML
+    private Label avgKids;
+    @FXML
+    private Label avgLifetime;
+    @FXML
+    private Label avgEnergy;
+    @FXML
+    private Label bestGen;
+    @FXML
+    private Label freeSpace;
+    @FXML
+    private Label numbOfGrass;
+    @FXML
     private GridPane mapGrid;
+    @FXML
+    private Button stopButton;
     private Globe worldMap;
+    private Simulation simulation;
+    private SimulationStatistics simulationStatistics;
+    private FollowAnimal followAnimal;
+    private Boolean stopFlag = false;
 
     public void initializeSimulation(HashMap<String, Integer> options) {
         AnimalBuilder animalBuilder = new AnimalBuilder()
@@ -36,6 +81,8 @@ public class SimulationPresenter implements MapChangeListener {
                 animalBuilder);
 
         worldMap.addListener(this);
+        this.simulationStatistics = new SimulationStatistics(worldMap);
+        this.followAnimal = new FollowAnimal(worldMap);
 
         Simulation simulation = new Simulation(new simulationBuilder()
                 .setMap(worldMap)
@@ -47,7 +94,7 @@ public class SimulationPresenter implements MapChangeListener {
                 .setFramePerSecond(options.get("framesPerSecond"))
                 .setAnimalBuilder(animalBuilder)
         );
-        List<Simulation> simulationList = new ArrayList<>();
+        this.simulation = simulation;
         Thread thread = new Thread(simulation);
         thread.start();
     }
@@ -58,7 +105,7 @@ public class SimulationPresenter implements MapChangeListener {
         int maxY = worldMap.getCurrentBounds().rightTop().getY();
         int minX = worldMap.getCurrentBounds().leftBottom().getX();
         int minY = worldMap.getCurrentBounds().leftBottom().getY();
-        int tileWidth = Math.min((int) 600 / maxX - minX + 1, (int) 600 / maxY - minY + 1);
+        int tileWidth = Math.min((int) 600 / (maxX - minX + 1), (int) 600 / (maxY - minY + 1));
         int tileHeight = tileWidth;
 
 
@@ -87,9 +134,14 @@ public class SimulationPresenter implements MapChangeListener {
         for (int i = minX; i <= maxX; i++) {
             for (int j = maxY; j >= minY; j--) {
                 if (worldMap.isOccupied(new Vector2d(i, j))) {
-                    Label label = new Label(worldMap.objectAt(new Vector2d(i, j)).toString());
-                    mapGrid.add(label, i - minX + 1, maxY - j + 1);
-                    GridPane.setHalignment(label, HPos.CENTER);
+                    Circle monster = worldMap.objectAt(new Vector2d(i, j)).toCircle();
+                    monster.setRadius(monster.getRadius()*tileWidth/3);
+                    mapGrid.add(monster,i - minX + 1, maxY - j + 1);
+                    GridPane.setHalignment(monster, HPos.CENTER);
+
+//                    Label label = new Label(worldMap.objectAt(new Vector2d(i, j)).toString());
+//                    mapGrid.add(label, i - minX + 1, maxY - j + 1);
+//                    GridPane.setHalignment(label, HPos.CENTER);
                 }
             }
         }
@@ -99,8 +151,61 @@ public class SimulationPresenter implements MapChangeListener {
         mapGrid.getColumnConstraints().clear();
         mapGrid.getRowConstraints().clear();
     }
+    @FXML
+    private void updateUIData(){
+        HashMap<String, String> data = simulationStatistics.getMapStatistics();
+        avgKids.setText(data.get("averageNumberOfChildren"));
+        avgLifetime.setText(data.get("averageLivedDays"));
+        avgEnergy.setText(data.get("averageEnergy"));
+        bestGen.setText(data.get("bestGenome"));
+        freeSpace.setText(data.get("numberOfFreePositions"));
+        numbOfGrass.setText(data.get("numberOfGrass"));
+    }
+    @FXML
+    private void updateFollowData(){
+        HashMap<String, String> data = followAnimal.getAnimalInfo();
+        followGenome.setText(data.get("genome"));
+        followEnergy.setText(data.get("energy"));
+        eatenGrass.setText(data.get("grassEaten"));
+        followChildren.setText(data.get("children"));
+        followDescendants.setText(data.get("descendants"));
+        followLifetime.setText(data.get("age"));
+        followDeath.setText(data.get("datOfDeath"));
+    }
     @Override
     public void mapChanged(WorldMap worldMap, String message) {
         Platform.runLater(this::drawMap);
+        Platform.runLater(this::updateUIData);
+        if(followAnimal.isFollowing()){
+            Platform.runLater(this::updateFollowData);
+        }
     }
+    @FXML
+    private void stop(){
+        if(!stopFlag){
+            stopFlag = true;
+            this.simulation.pause();
+            stopButton.setText("Wznow");
+//            setToTrack();
+        }
+        else{
+            stopFlag = false;
+            this.simulation.resume();
+            stopButton.setText("Zatrzymaj");
+        }
+    }
+    @FXML
+    private void clickGrid(javafx.scene.input.MouseEvent event){
+        Node clickedNode = event.getPickResult().getIntersectedNode();
+        if (stopFlag && clickedNode != mapGrid) {
+            // click on descendant node
+            int colIndex = GridPane.getColumnIndex(clickedNode) - 1;
+            int rowIndex = worldMap.getCurrentBounds().rightTop().getX() - GridPane.getRowIndex(clickedNode) + 1;
+            followAnimal.startFollowing(colIndex,rowIndex);
+            Platform.runLater(this::updateFollowData);
+        }
+    }
+//    private void setToTrack(){
+//        mapGrid.setOnMouseClicked();
+//    }
 }

@@ -1,4 +1,7 @@
 package agh.ics.oop.model;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -48,7 +51,9 @@ public class Animal implements  WorldElement, Comparable<Animal>{
             case NORTHWEST -> "NW";
         };
     }
-
+    public Circle toCircle(){
+        return new Circle(1, Color.GREEN.interpolate(Color.RED, (double) this.animalConfiguration.fullEnergy /this.energy));
+    }
     public boolean isAt(Vector2d position) {
         return  this.position.equals(position);
     }

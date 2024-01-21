@@ -7,10 +7,11 @@ import agh.ics.oop.model.Vector2d;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class simulationStatistics {
-    Globe globe;
-    public simulationStatistics(Globe globe){
+public class SimulationStatistics {
+    private Globe globe;
+    public SimulationStatistics(Globe globe){
         this.globe = globe;
     }
     public Integer getNumberOfAnimals(){
@@ -45,7 +46,6 @@ public class simulationStatistics {
         }
         return (double) sum / allAnimals.size();
     }
-
     public Double getAverageNumberOfChildren(){
         List<Animal> allAnimals = globe.getAllAnimals();
         if(allAnimals.isEmpty()){
@@ -62,9 +62,10 @@ public class simulationStatistics {
         mapStatistics.put("numberOfAnimals",getNumberOfAnimals().toString());
         mapStatistics.put("numberOfGrass",getNumberOfGrass().toString());
         mapStatistics.put("numberOfFreePositions",getNumberOfFreePositions().toString());
-        mapStatistics.put("averageEnergy",getAverageEnergy().toString());
-        mapStatistics.put("averageNumberOfChildren",getAverageNumberOfChildren().toString());
-        mapStatistics.put("averageLivedDays", globe.getAverageLifeSpan().toString());
+        mapStatistics.put("averageEnergy",String.format("%.2f",getAverageEnergy()));
+        mapStatistics.put("averageNumberOfChildren",String.format("%.2f", getAverageNumberOfChildren()));
+        mapStatistics.put("averageLivedDays", String.format("%.2f",globe.getAverageLifeSpan()));
+        mapStatistics.put("bestGenome", globe.getMostPopularGenome().stream().map(gen -> gen.toString()).collect(Collectors.joining()));
         return mapStatistics;
     }
 }

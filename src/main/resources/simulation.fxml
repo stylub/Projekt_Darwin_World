@@ -1,46 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.chart.CategoryAxis?>
-<?import javafx.scene.chart.NumberAxis?>
-<?import javafx.scene.chart.ScatterChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane minHeight="1" minWidth="1" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="agh.ics.oop.GUI.SimulationPresenter">
    <left>
-      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+      <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
-            <ScatterChart prefHeight="372.0" prefWidth="110.0">
-              <xAxis>
-                <CategoryAxis side="BOTTOM" />
-              </xAxis>
-              <yAxis>
-                <NumberAxis side="LEFT" />
-              </yAxis>
-            </ScatterChart>
+            <Label prefHeight="17.0" prefWidth="103.0" text="Liczba zwierzaków" VBox.vgrow="ALWAYS" />
+            <Label contentDisplay="CENTER" text="Dane" VBox.vgrow="ALWAYS" />
+            <Label text="Liczba roślin" />
+            <Label fx:id="numbOfGrass" text="Dane" />
+            <Label text="Wolne pola" />
+            <Label fx:id="freeSpace" text="Dane" />
+            <Label text="Najlepszy gen" />
+            <Label fx:id="bestGen" text="Dane" />
+            <Label text="Avg energia" />
+            <Label fx:id="avgEnergy" text="Dane" />
+            <Label text="Avg lifetime" />
+            <Label fx:id="avgLifetime" text="Dane" />
+            <Label text="Avg liczba dzieci" />
+            <Label fx:id="avgKids" text="Dane" />
          </children>
       </VBox>
    </left>
    <center>
-       <GridPane fx:id="mapGrid" gridLinesVisible="true" alignment="CENTER"/>
+       <GridPane fx:id="mapGrid" alignment="CENTER" gridLinesVisible="true" onMouseClicked="#clickGrid" />
    </center>
    <right>
       <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
-            <Label prefHeight="44.0" prefWidth="100.0" text="TODO" />
+            <Label prefHeight="17.0" prefWidth="103.0" text="Genom" />
+            <Label fx:id="followGenome" contentDisplay="CENTER" text="-" />
+            <Label text="Energia" />
+            <Label fx:id="followEnergy" text="-" />
+            <Label text="Zjedzone rośliny" />
+            <Label fx:id="eatenGrass" text="-" />
+            <Label text="Liczba dzieci" />
+            <Label fx:id="followChildren" text="-" />
+            <Label text="Liczba potomków" />
+            <Label fx:id="followDescendants" text="-" />
+            <Label text="Czas życia" />
+            <Label fx:id="followLifetime" text="-" />
+            <Label text="Wiek zgodu" />
+            <Label fx:id="followDeath" text="-" />
+            <Label text="Dominujące zwierzaki" />
+            <Button fx:id="showStrongest" mnemonicParsing="false" text="Pokaż" />
+            <Label text="Preferowane pola" />
+            <Button fx:id="showPrefferedFields" mnemonicParsing="false" text="Pokaż" />
          </children></VBox>
    </right>
    <bottom>
-      <HBox prefHeight="28.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+      <HBox alignment="CENTER" prefHeight="28.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
-            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="Zapisz" />
-            <Button mnemonicParsing="false" text="Zatrzymaj" />
+            <Button fx:id="save" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="Zapisz" />
+            <Button fx:id="stopButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#stop" text="Zatrzymaj" />
          </children>
       </HBox>
    </bottom>
