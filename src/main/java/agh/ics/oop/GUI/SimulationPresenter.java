@@ -170,7 +170,7 @@ public class SimulationPresenter implements MapChangeListener {
         followChildren.setText(data.get("children"));
         followDescendants.setText(data.get("descendants"));
         followLifetime.setText(data.get("age"));
-        followDeath.setText(data.get("datOfDeath"));
+        followDeath.setText(data.get("dayOfDeath"));
     }
     @Override
     public void mapChanged(WorldMap worldMap, String message) {

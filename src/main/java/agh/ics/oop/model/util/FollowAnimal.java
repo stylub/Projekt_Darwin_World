@@ -37,7 +37,12 @@ public class FollowAnimal {
             animalInfo.put("children",String.valueOf(animal.getNumberOfChildren()));
             animalInfo.put("descendants",String.valueOf(animal.getNumberOfDescendants()));
             animalInfo.put("age",String.valueOf(animal.getAge()));
-            animalInfo.put("dayOfDeath",String.valueOf(animal.getBornDay() + animal.getAge()));
+            if (animal.isDead()) {
+                animalInfo.put("dayOfDeath", String.valueOf(animal.getBornDay() + animal.getAge()));
+            }
+            else{
+                animalInfo.put("dayOfDeath",null);
+            }
         }
         return animalInfo;
     }
