@@ -117,7 +117,7 @@ public class SimulationLauncher {
         checkSpinners();
         Stream<String> lines = Files.lines(Paths.get("configs/" + configName.getCharacters().toString() +".csv"));
         HashMap<String, Integer> newOptions = new HashMap<>();
-        lines.map(line -> line.split(" "))
+        lines.map(line -> line.split(";"))
                 .filter(line -> !line[0].equals("Option"))
                 .forEach(line -> newOptions.put(line[0], Integer.valueOf(line[1])));
         lines.close();
@@ -133,9 +133,9 @@ public class SimulationLauncher {
 
         //Save everything in new file
         try (FileWriter csvWriter = new FileWriter(new File("configs", cfgName +".csv"))) {
-            csvWriter.append("Option value\n");
+            csvWriter.append("Option;value\n");
             for (String key:options.keySet()) {
-                csvWriter.append(key).append(" ");
+                csvWriter.append(key).append(";");
                 csvWriter.append(options.get(key).toString()).append("\n");
             }
             csvWriter.close();

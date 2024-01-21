@@ -8,7 +8,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-//Tymczasowa klasa do odpalania GUI
+
 public class SimulationApp extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException, InterruptedException {

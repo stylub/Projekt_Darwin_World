@@ -275,7 +275,7 @@ public class SimulationPresenter implements MapChangeListener {
             }
             HashMap<String, String> data = simulationStatistics.getMapStatistics();
             for (String key : data.keySet()) {
-                this.csvWriter.append(data.get(key)).append(" ");
+                this.csvWriter.append(data.get(key)).append(";");
             }
             this.csvWriter.append("\n");
             this.csvWriter.flush();
@@ -287,7 +287,7 @@ public class SimulationPresenter implements MapChangeListener {
     private void addSaveOutcomeFileColumns() throws IOException{
         try {
             for (String key : this.simulationStatistics.getMapStatistics().keySet()) {
-                this.csvWriter.append(key).append(" ");
+                this.csvWriter.append(key).append(";");
             }
             this.csvWriter.append("\n");
             this.outcomeFilesInitialized = true;

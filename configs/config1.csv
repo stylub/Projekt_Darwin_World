@@ -1,16 +1,17 @@
-Option value
-maxMutations 1
-animalFullEnergy 1
-mutationVariant 0
-grassEnergy 1
-grassRegeneration 1
-genomeLength 1
-animalStartingNumber 1
-animalStartingEnergy 1
-mapHeight 1
-minMutations 1
-grassGrowthVariant 1
-framesPerSecond 1
-animalBreedEnergy 1
-mapWidth 1
-grassStartingNumber 1
+Option;value
+maxMutations;3
+animalFullEnergy;20
+saveOutcome;0
+mutationVariant;0
+grassEnergy;11
+grassRegeneration;5
+genomeLength;7
+animalStartingNumber;15
+animalStartingEnergy;20
+mapHeight;25
+minMutations;1
+grassGrowthVariant;0
+framesPerSecond;2
+animalBreedEnergy;35
+mapWidth;25
+grassStartingNumber;9
