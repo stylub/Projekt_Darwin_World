@@ -18,10 +18,15 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
 public class SimulationPresenter implements MapChangeListener {
+    @FXML
+    private Label numbOfAnimals;
     @FXML
     private Label followGenome;
     @FXML
@@ -40,8 +45,6 @@ public class SimulationPresenter implements MapChangeListener {
     private Button showStrongest;
     @FXML
     private Button showPrefferedFields;
-    @FXML
-    private Button save;
     @FXML
     private Label avgKids;
     @FXML
@@ -67,9 +70,14 @@ public class SimulationPresenter implements MapChangeListener {
     private int gridWidth = 600;
     private Boolean isPrefFieldsShown = false;
     private Boolean isShowStrongest = false;
+    private File simulationDataFile;
+    private FileWriter csvWriter;
+    private Boolean saveData;
+    private Boolean outcomeFilesInitialized = false;
 
     public void initializeSimulation(HashMap<String, Integer> options) {
         this.height = options.get("mapHeight");
+        this.saveData = options.get("saveOutcome").toString().equals("1");
         AnimalBuilder animalBuilder = new AnimalBuilder()
                 .setEnergy(options.get("animalStartingEnergy"))
                 .setGenomeLength(options.get("genomeLength"))
@@ -159,6 +167,7 @@ public class SimulationPresenter implements MapChangeListener {
         bestGen.setText(data.get("bestGenome"));
         freeSpace.setText(data.get("numberOfFreePositions"));
         numbOfGrass.setText(data.get("numberOfGrass"));
+        numbOfAnimals.setText(data.get("numberOfAnimals"));
     }
     @FXML
     private void updateFollowData(){
@@ -177,6 +186,9 @@ public class SimulationPresenter implements MapChangeListener {
         Platform.runLater(this::updateUIData);
         if(followAnimal.isFollowing()){
             Platform.runLater(this::updateFollowData);
+        }
+        if(this.saveData){
+            saveDayToData();
         }
     }
     @FXML
@@ -242,6 +254,46 @@ public class SimulationPresenter implements MapChangeListener {
             this.isShowStrongest = false;
             showStrongest.setText("Ukryj");
             drawMap();
+        }
+    }
+    public void setSimulationDataFile(String name){
+        this.simulationDataFile = new File("simulation data", name +".csv");
+        setCsvWriter(this.simulationDataFile);
+    }
+    public void setCsvWriter(File file){
+        try {
+            this.csvWriter = new FileWriter(file);
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+    private void saveDayToData(){
+        try {
+            if(!outcomeFilesInitialized){
+                addSaveOutcomeFileColumns();
+            }
+            HashMap<String, String> data = simulationStatistics.getMapStatistics();
+            for (String key : data.keySet()) {
+                this.csvWriter.append(data.get(key)).append(" ");
+            }
+            this.csvWriter.append("\n");
+            this.csvWriter.flush();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+    private void addSaveOutcomeFileColumns() throws IOException{
+        try {
+            for (String key : this.simulationStatistics.getMapStatistics().keySet()) {
+                this.csvWriter.append(key).append(" ");
+            }
+            this.csvWriter.append("\n");
+            this.outcomeFilesInitialized = true;
+        }
+        catch (IOException e){
+            e.printStackTrace();
         }
     }
 }

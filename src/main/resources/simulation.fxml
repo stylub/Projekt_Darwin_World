@@ -12,7 +12,7 @@
       <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
             <Label prefHeight="17.0" prefWidth="103.0" text="Liczba zwierzaków" VBox.vgrow="ALWAYS" />
-            <Label contentDisplay="CENTER" text="Dane" VBox.vgrow="ALWAYS" />
+            <Label fx:id="numbOfAnimals" contentDisplay="CENTER" text="Dane" VBox.vgrow="ALWAYS" />
             <Label text="Liczba roślin" />
             <Label fx:id="numbOfGrass" text="Dane" />
             <Label text="Wolne pola" />
@@ -57,7 +57,6 @@
    <bottom>
       <HBox alignment="CENTER" prefHeight="28.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="save" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="Zapisz" />
             <Button fx:id="stopButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#stop" text="Zatrzymaj" />
          </children>
       </HBox>

@@ -65,18 +65,19 @@ public class SimulationLauncher {
     private Label saveOutcomeLabel;
     @FXML
     private TextField saveOutcomeTextField;
-    private Boolean isOutputTextFieldShown = false;
     @FXML
     public void launchSimulation() throws IOException {
 //        Update options to pass them into presenter
         updateOptions();
-        System.out.println(grassGrowthVariant.toString());
 //        Set up new window, with new simulation and new presenter
         Stage stage = new Stage();
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getClassLoader().getResource("simulation.fxml"));
         BorderPane viewRoot = loader.load();
         SimulationPresenter presenter = loader.getController();
+        if(options.get("saveOutcome").toString().equals("1")){
+            presenter.setSimulationDataFile(saveOutcomeTextField.getCharacters().toString());
+        }
         presenter.initializeSimulation(options);
         configureStage(stage, viewRoot);
         stage.show();
@@ -99,6 +100,7 @@ public class SimulationLauncher {
         }
         options.put(mutationVariant.getId(), mutationVariant.getValue().equals(defaultMutation) ? 0 : 1);
         options.put(grassGrowthVariant.getId(), grassGrowthVariant.getValue().equals(defaultGrassGrowth) ? 0 : 1);
+        options.put(saveOutcome.getId(), saveOutcome.isSelected() ? 1 : 0);
     }
     private void updateGUI(HashMap<String, Integer> newOptions){
         for(Spinner<Integer> spinner: spinners){
@@ -106,6 +108,9 @@ public class SimulationLauncher {
         }
         mutationVariant.setValue(newOptions.get(mutationVariant.getId())  == 0 ? defaultMutation : substitutionMutation);
         grassGrowthVariant.setValue(newOptions.get(grassGrowthVariant.getId()) == 0 ? defaultGrassGrowth : deadAnimalGrassGrowth);
+        saveOutcome.setSelected(newOptions.get(saveOutcome.getId()) == 1);
+        saveOutcomeLabel.setVisible(newOptions.get(saveOutcome.getId()) == 1);
+        saveOutcomeTextField.setVisible(newOptions.get(saveOutcome.getId()) == 1);
     }
     @FXML
     private void loadConfig() throws IOException {
@@ -115,7 +120,6 @@ public class SimulationLauncher {
         lines.map(line -> line.split(" "))
                 .filter(line -> !line[0].equals("Option"))
                 .forEach(line -> newOptions.put(line[0], Integer.valueOf(line[1])));
-        System.out.println(newOptions);
         lines.close();
         updateGUI(newOptions);
     }
@@ -146,7 +150,6 @@ public class SimulationLauncher {
     }
     @FXML
     private void showSaveOutcomeFields(){
-        System.out.println(saveOutcome.getViewOrder());
         if(!saveOutcomeTextField.isVisible()){
             saveOutcomeLabel.setVisible(true);
             saveOutcomeTextField.setVisible(true);
