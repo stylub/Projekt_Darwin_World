@@ -16,7 +16,6 @@ public class Globe implements WorldMap{
     private final List<MapChangeListener> observers = new ArrayList<>();
     private final HashMap<List<Integer>,Integer> countGenome = new HashMap<>();
     private final  Queue<Animal> recentlyDeadAnimals = new ArrayDeque<Animal>();
-    private final int maxQueueSize;
     Incubator incubator;
     int whichDay = 1;
 
@@ -36,7 +35,6 @@ public class Globe implements WorldMap{
     public Globe(int width,int height,int startingGrass, int newGrass,GrassVariant grassVariant,int mutationVariant,AnimalBuilder animalConfiguration){
         incubator = new Incubator(mutationVariant,animalConfiguration);
         boundary = new Boundary(new Vector2d(0, 0), new Vector2d(width, height));
-        maxQueueSize = (width * height) / 8 ;
         this.grassGenerator = new GrassGenerator(width + 1,height + 1,startingGrass,0.8,grassVariant,newGrass,this);
         for(var pos : grassGenerator){
             grass.put(pos,new Grass(pos));
@@ -194,9 +192,6 @@ public class Globe implements WorldMap{
     private void deleteAnimal(Animal animal){
         remove(animal);
         recentlyDeadAnimals.offer(animal);
-        if(recentlyDeadAnimals.size() > maxQueueSize){
-            recentlyDeadAnimals.poll();
-        }
         removeGenome(animal.getGenome());
         numberOfDeadAnimals = numberOfDeadAnimals.add(BigInteger.ONE);
         deadAnimalsSumOfLivedDays = deadAnimalsSumOfLivedDays.add(BigInteger.valueOf(animal.getAge()));
@@ -310,6 +305,13 @@ public class Globe implements WorldMap{
     }
     public List<Vector2d> getPreferredPositions(){
         return grassGenerator.getPreferredPositions();
+    }
+    public List<Vector2d> getRecentlyDeadAnimalsPositions(){
+        List<Vector2d> positions = new ArrayList<>();
+        while (!recentlyDeadAnimals.isEmpty()){
+            positions.add(recentlyDeadAnimals.poll().getPosition());
+        }
+        return positions;
     }
 
 }
