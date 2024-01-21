@@ -11,7 +11,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 public class GrassGenerator extends RandomPositionGenerator{
-    private final HashSet<Vector2d> preferredPositions = new HashSet<>();
+    private final Map<Vector2d,Integer> preferredPositions = new HashMap<>();
     long seed = System.nanoTime();
     private final double ratio;
     private final GrassVariant grassVariant;
@@ -25,7 +25,7 @@ public class GrassGenerator extends RandomPositionGenerator{
         this.grassVariant = grassVariant;
         this.newGrass = newGrass;
         this.globe = globe;
-        this.maxNumberOfFertilizedPositions = (int) (maxWidth * maxHeight * (1 - ratio)) + 2;
+        this.maxNumberOfFertilizedPositions = (int) ((maxWidth * maxHeight * (1 - ratio))/8) + 2;
         grassCount = min(grassCount,maxWidth * maxHeight);
         this.ratio = ratio;
         numberOfPreferredPositions = (maxWidth * maxHeight) - (int) (ratio * maxWidth * maxHeight);
@@ -36,7 +36,7 @@ public class GrassGenerator extends RandomPositionGenerator{
         List<Vector2d> notPreferred = new ArrayList<>();
         for (int i = 0; i < maxWidth; i++) {
             for(int j = 0; j < maxHeight; j++){
-                if(preferredPositions.contains(new Vector2d(i,j))) {
+                if(preferredPositions.containsKey(new Vector2d(i,j))) {
                     preferred.add(new Vector2d(i, j));
                 }
                 else{
@@ -98,12 +98,17 @@ public class GrassGenerator extends RandomPositionGenerator{
     private void fertilize(Vector2d position){
         int left = max(position.getX() - 1,0);
         int right = min(position.getX() + 1,maxWidth);
-        int top = max(position.getY() + 1,maxHeight);
-        int bottom = min(position.getY() - 1,0);
+        int top = min(position.getY() + 1,maxHeight - 1);
+        int bottom = max(position.getY() - 1,0);
 
         for(int i = left; i <= right; i++){
             for(int j = bottom; j <= top; j++){
-                preferredPositions.add(new Vector2d(i,j));
+                if(!preferredPositions.containsKey(new Vector2d(i,j))){
+                    preferredPositions.put(new Vector2d(i, j),1);
+                }
+                else{
+                    preferredPositions.put(new Vector2d(i, j),preferredPositions.get(new Vector2d(i,j)) + 1);
+                }
             }
         }
     }
@@ -111,12 +116,17 @@ public class GrassGenerator extends RandomPositionGenerator{
     private void unfertilize(Vector2d position){
         int left = max(position.getX() - 1,0);
         int right = min(position.getX() + 1,maxWidth);
-        int top = max(position.getY() + 1,maxHeight);
-        int bottom = min(position.getY() - 1,0);
+        int top = min(position.getY() + 1,maxHeight - 1);
+        int bottom = max(position.getY() - 1,0);
 
         for(int i = left; i <= right; i++){
             for(int j = bottom; j <= top; j++){
-                preferredPositions.remove(new Vector2d(i,j));
+                if(preferredPositions.get(new Vector2d(i,j)) > 1){
+                    preferredPositions.put(new Vector2d(i, j),preferredPositions.get(new Vector2d(i,j)) - 1);
+                }
+                else {
+                    preferredPositions.remove(new Vector2d(i, j));
+                }
             }
         }
     }
@@ -128,7 +138,9 @@ public class GrassGenerator extends RandomPositionGenerator{
         }
         Collections.shuffle(allPositions, new Random(seed));
         allPositions = allPositions.subList(0,number);
-        preferredPositions.addAll(allPositions);
+        for(Vector2d position : allPositions){
+            preferredPositions.put(position,1);
+        }
     }
 
     public void generateNewPositions() {
@@ -140,10 +152,11 @@ public class GrassGenerator extends RandomPositionGenerator{
         currentIndex = 0;
         List<Vector2d> preferred = new ArrayList<>();
         List<Vector2d> notPreferred = new ArrayList<>();
+
         for (int i = 0; i < maxWidth; i++) {
             for(int j = 0; j < maxHeight; j++){
                 if(!currentGrass.containsKey(new Vector2d(i,j))){
-                    if (preferredPositions.contains(new Vector2d(i, j))) {
+                    if (preferredPositions.containsKey(new Vector2d(i, j))) {
                         preferred.add(new Vector2d(i, j));
                     } else {
                         notPreferred.add(new Vector2d(i, j));
@@ -162,6 +175,6 @@ public class GrassGenerator extends RandomPositionGenerator{
     }
 
     public List<Vector2d> getPreferredPositions() {
-        return new ArrayList<>(preferredPositions);
+        return new ArrayList<>(preferredPositions.keySet());
     }
 }
