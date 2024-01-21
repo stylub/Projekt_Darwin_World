@@ -3,9 +3,7 @@ package agh.ics.oop.GUI;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import java.io.File;
@@ -61,6 +59,13 @@ public class SimulationLauncher {
     private String defaultMutation;
     @FXML
     private String substitutionMutation;
+    @FXML
+    private CheckBox saveOutcome;
+    @FXML
+    private Label saveOutcomeLabel;
+    @FXML
+    private TextField saveOutcomeTextField;
+    private Boolean isOutputTextFieldShown = false;
     @FXML
     public void launchSimulation() throws IOException {
 //        Update options to pass them into presenter
@@ -137,6 +142,18 @@ public class SimulationLauncher {
     private void checkSpinners(){
         if(Objects.isNull(spinners)){
             spinners = new ArrayList<>(List.of(mapHeight,mapWidth,grassStartingNumber,grassEnergy,grassRegeneration,genomeLength,minMutations,maxMutations,animalStartingNumber,animalStartingEnergy,animalFullEnergy,animalBreedEnergy,framesPerSecond));
+        }
+    }
+    @FXML
+    private void showSaveOutcomeFields(){
+        System.out.println(saveOutcome.getViewOrder());
+        if(!saveOutcomeTextField.isVisible()){
+            saveOutcomeLabel.setVisible(true);
+            saveOutcomeTextField.setVisible(true);
+        }
+        else{
+            saveOutcomeLabel.setVisible(false);
+            saveOutcomeTextField.setVisible(false);
         }
     }
 }

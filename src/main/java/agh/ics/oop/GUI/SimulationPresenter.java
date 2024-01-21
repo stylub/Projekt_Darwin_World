@@ -14,11 +14,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 public class SimulationPresenter implements MapChangeListener {
@@ -63,8 +63,13 @@ public class SimulationPresenter implements MapChangeListener {
     private SimulationStatistics simulationStatistics;
     private FollowAnimal followAnimal;
     private Boolean stopFlag = false;
+    private int height;
+    private int gridWidth = 600;
+    private Boolean isPrefFieldsShown = false;
+    private Boolean isShowStrongest = false;
 
     public void initializeSimulation(HashMap<String, Integer> options) {
+        this.height = options.get("mapHeight");
         AnimalBuilder animalBuilder = new AnimalBuilder()
                 .setEnergy(options.get("animalStartingEnergy"))
                 .setGenomeLength(options.get("genomeLength"))
@@ -101,14 +106,8 @@ public class SimulationPresenter implements MapChangeListener {
     @FXML
     public void drawMap() {
         clearGrid();
-        int maxX = worldMap.getCurrentBounds().rightTop().getX();
-        int maxY = worldMap.getCurrentBounds().rightTop().getY();
-        int minX = worldMap.getCurrentBounds().leftBottom().getX();
-        int minY = worldMap.getCurrentBounds().leftBottom().getY();
-        int tileWidth = Math.min((int) 600 / (maxX - minX + 1), (int) 600 / (maxY - minY + 1));
+        int tileWidth = (int) this.gridWidth / (this.height + 1);
         int tileHeight = tileWidth;
-
-
         mapGrid.addColumn(0);    //coordinates col
         mapGrid.getColumnConstraints().add(new ColumnConstraints(tileWidth));
         mapGrid.addRow(0);       //coordinates row
@@ -116,27 +115,27 @@ public class SimulationPresenter implements MapChangeListener {
         Label zeroLabel = new Label("y\\x");
         mapGrid.add(zeroLabel, 0, 0);
         GridPane.setHalignment(zeroLabel, HPos.CENTER);
-        for (int i = minX; i <= maxX; i++) {
-            mapGrid.addColumn(i - minX + 1);
+        for (int i = 0; i <= height; i++) {
+            mapGrid.addColumn(i + 1);
             mapGrid.getColumnConstraints().add(new ColumnConstraints(tileWidth));
             Label zeroXLabel = new Label(Integer.toString(i));
-            mapGrid.add(zeroXLabel, i - minX + 1, 0);
+            mapGrid.add(zeroXLabel, i + 1, 0);
             GridPane.setHalignment(zeroXLabel, HPos.CENTER);
         }
 
-        for (int i = maxY; i >= minY; i--) {
-            mapGrid.addRow(maxY - i + 1);
+        for (int i = height; i >= 0; i--) {
+            mapGrid.addRow(height - i + 1);
             mapGrid.getRowConstraints().add(new RowConstraints(tileHeight));
             Label zeroYLabel = new Label(Integer.toString(i));
-            mapGrid.add(zeroYLabel, 0, maxY - i + 1);
+            mapGrid.add(zeroYLabel, 0, this.height - i + 1);
             GridPane.setHalignment(zeroYLabel, HPos.CENTER);
         }
-        for (int i = minX; i <= maxX; i++) {
-            for (int j = maxY; j >= minY; j--) {
+        for (int i = 0; i <= this.height; i++) {
+            for (int j = this.height; j >= 0; j--) {
                 if (worldMap.isOccupied(new Vector2d(i, j))) {
                     Circle monster = worldMap.objectAt(new Vector2d(i, j)).toCircle();
                     monster.setRadius(monster.getRadius()*tileWidth/3);
-                    mapGrid.add(monster,i - minX + 1, maxY - j + 1);
+                    mapGrid.add(monster,i + 1, this.height - j + 1);
                     GridPane.setHalignment(monster, HPos.CENTER);
 
 //                    Label label = new Label(worldMap.objectAt(new Vector2d(i, j)).toString());
@@ -205,7 +204,44 @@ public class SimulationPresenter implements MapChangeListener {
             Platform.runLater(this::updateFollowData);
         }
     }
-//    private void setToTrack(){
-//        mapGrid.setOnMouseClicked();
-//    }
+    @FXML
+    private void showFields(){
+        if(!isPrefFieldsShown) {
+            this.isPrefFieldsShown = true;
+            List<Vector2d> prefferedPositions = worldMap.getPreferredPositions();
+            for (Vector2d field:prefferedPositions) {
+                showPrefferedFields.setText("Pokaz");
+                Rectangle rectangle = new Rectangle();
+                rectangle.setHeight((double) this.gridWidth/(this.height+1));
+                rectangle.setWidth((double) this.gridWidth/(this.height+1));
+                rectangle.setOpacity(0.5);
+                rectangle.setFill(Color.LIGHTBLUE);
+                mapGrid.add(rectangle,field.getX() + 1, this.height - field.getY() + 1);
+            }
+        }
+        else{
+            this.isPrefFieldsShown = false;
+            showPrefferedFields.setText("Ukryj");
+            drawMap();
+        }
+    }
+    @FXML
+    private void showStrongestAnimals(){
+        if(!this.isShowStrongest){
+            this.isShowStrongest = true;
+            showStrongest.setText("Pokaz");
+            List<Animal> strongestAnimals = worldMap.getAnimalsWithDominatingGenome();
+            for(Animal animal:strongestAnimals){
+                Circle circle = new Circle(this.gridWidth/(2*(this.height+1)));
+                circle.setOpacity(0.5);
+                circle.setFill(Color.BLUE);
+                mapGrid.add(circle,animal.getPosition().getX() + 1, this.height - animal.getPosition().getY() + 1);
+            }
+        }
+        else{
+            this.isShowStrongest = false;
+            showStrongest.setText("Ukryj");
+            drawMap();
+        }
+    }
 }

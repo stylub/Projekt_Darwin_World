@@ -3,6 +3,7 @@
 <?import java.lang.String?>
 <?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
@@ -50,6 +51,9 @@
                         <SpinnerValueFactory.IntegerSpinnerValueFactory initialValue="10" max="1000" min="1" />
                      </valueFactory>
                   </Spinner>
+                  <CheckBox fx:id="saveOutcome" mnemonicParsing="false" prefHeight="32.0" prefWidth="103.0" text="Zapisz wyniki" onAction="#showSaveOutcomeFields"/>
+                  <Label fx:id="saveOutcomeLabel" visible="false" text="Nazwa pliku z wynikami" />
+                  <TextField fx:id="saveOutcomeTextField" visible="false" />
                </children>
             </VBox>
             <Separator orientation="VERTICAL" prefHeight="200.0" HBox.hgrow="ALWAYS" />
@@ -83,8 +87,8 @@
                   <ComboBox fx:id="grassGrowthVariant" prefWidth="150.0" value="Domyślny" visibleRowCount="2">
                       <items>
                           <FXCollections fx:factory="observableArrayList">
-                              <String fx:value="Domyślny" fx:id="defaultGrassGrowth"/>
-                              <String fx:value="ŻyciodajneTruchła" fx:id="deadAnimalGrassGrowth"/>
+                              <String fx:id="defaultGrassGrowth" fx:value="Domyślny" />
+                              <String fx:id="deadAnimalGrassGrowth" fx:value="ŻyciodajneTruchła" />
                           </FXCollections>
                       </items>
                   </ComboBox>
@@ -122,8 +126,8 @@
                    <items>
                        <FXCollections fx:factory="observableArrayList">
 
-                           <String fx:value="Domyślny" fx:id="defaultMutation"/>
-                           <String fx:value="Podmianka" fx:id="substitutionMutation"/>
+                           <String fx:id="defaultMutation" fx:value="Domyślny" />
+                           <String fx:id="substitutionMutation" fx:value="Podmianka" />
                        </FXCollections>
                    </items>
                   </ComboBox>

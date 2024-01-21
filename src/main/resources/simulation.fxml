@@ -49,9 +49,9 @@
             <Label text="Wiek zgodu" />
             <Label fx:id="followDeath" text="-" />
             <Label text="Dominujące zwierzaki" />
-            <Button fx:id="showStrongest" mnemonicParsing="false" text="Pokaż" />
+            <Button fx:id="showStrongest" mnemonicParsing="false" text="Pokaż" onAction="#showStrongestAnimals"/>
             <Label text="Preferowane pola" />
-            <Button fx:id="showPrefferedFields" mnemonicParsing="false" text="Pokaż" />
+            <Button fx:id="showPrefferedFields" mnemonicParsing="false" text="Pokaż" onAction="#showFields"/>
          </children></VBox>
    </right>
    <bottom>
